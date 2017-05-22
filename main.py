@@ -18,7 +18,7 @@ Denon   = SerialInterface(IPCP, 'COM1', Baud=9600, Data=8, Parity='None',
 LCDs    = SerialInterface(IPCP, 'COM2', Baud=9600, Data=8, Parity='None',
                           Stop=1, FlowControl='Off', CharDelay=0, Mode='RS232')
 #--
-Quantum = EthernetClientInterface('192.168.10.152', 23)
+Quantum = EthernetClientInterface('192.168.10.152', 23, 'TCP')
 Tesira  = EthernetClientInterface('192.168.10.150', 22, 'SSH',
                                    Credentials=('default', ''))
 ##
@@ -58,8 +58,7 @@ ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
 ##
 ## Begin Communication Interface Definition ------------------------------------
 ## End Communication Interface Definition --------------------------------------
-def Initialize():
-    #Show IPLink Information
+def Initialize():    
     print(ProgramInfo)
     print("System Initialize")
     pass
@@ -81,31 +80,31 @@ def GroupModeHandler(button, state):
         LblMaster.SetText('Proyección de Video')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('VWall')
-        print('Touch Mode Active: %s' % ('VideoWall'))
+        print('Touch Mode: %s' % ('VideoWall'))
     #--
     elif button is BtnAudio and state == 'Pressed':
         LblMaster.SetText('Selección de Audio')
         TLP.ShowPopup('Audios')
-        print('Touch Mode Active: %s' % ('Audio'))
+        print('Touch Mode: %s' % ('Audio'))
     #--
     elif button is BtnBluRay and state == 'Pressed':
         Denon.Send(b'PW?\r')
         LblMaster.SetText('Control de BluRay')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('BR')
-        print('Touch Mode Active: %s' % ('Bluray'))
+        print('Touch Mode: %s' % ('Bluray'))
     #--
     elif button is BtnStatus and state == 'Pressed':
         LblMaster.SetText('Información de dispositivos')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('Status')
-        print('Touch Mode Active: %s' % ('Status'))
+        print('Touch Mode: %s' % ('Status'))
     #--
     elif button is BtnPowerOff and state == 'Pressed':
         LblMaster.SetText('Apagado del Sistema')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('x_PowerOff')
-        print('Touch Mode Active: %s' % ('PowerOff'))
+        print('Touch Mode: %s' % ('PowerOff'))
     #--
     pass
 

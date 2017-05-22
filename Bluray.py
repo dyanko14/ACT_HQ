@@ -11,7 +11,7 @@ from extronlib.system import Clock, MESet, Wait
 import time #To handle time in LAN/RS232 Connections
 import re   #To handle data with Regular Expressions
 
-print('Running Python File <|--Denon Bluray')
+print('Running Python File <|--Bluray')
 
 def BlurayControl(IPCP, TLP, Denon):  
     '''>>Instantiated Buttons------------------------------------------------'''
@@ -83,29 +83,9 @@ def BlurayControl(IPCP, TLP, Denon):
     '''>>Opening of Communications ------------------------------------------'''
     Denon.Initialize()
 
-    @event(Denon, ['Online', 'Offline'])
-    def DenonHandleConnection(interface, state):
-        print('{} is now {}'.format('Denon', state))
-        if state == 'Online':
-            Btn232Denon.SetState(1)
-        elif state == 'Offline':
-            Btn232Denon.SetState(0)
+
     '''>>Data Parsing from Connected Devices --------------------------------'''
-    
-    @event(Denon, 'ReceiveData')
-    def DenonParser(interface, data):
-        msj = ''
-        data = data.decode() #Delete b and \r
-        data = data.replace(' ','') #Delete Whitespaces
-        for item in data:           
-            msj = msj + item
-            print(msj)
-            if msj == 'PWON':
-                print('Denon Power Status {0}'.format('On'))
-                msj = ''
-            elif msj == 'PWOF':
-                print('Denon Power Status {0}'.format('Off'))
-                msj = ''
+
 
     '''>>User Button Events -------------------------------------------------'''
     @event(PageBRNav, ButtonEventList)

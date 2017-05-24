@@ -90,70 +90,13 @@ def AudioControl(IPCP, TLP, Tesira):
     ## -----------
     ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
 
-    '''>>Dictionaries of Data -----------------------------------------------'''
-    Tesira_Command = {
-        #-Router A
-        'SelectorA_Ch1' : (b'SelectorA set sourceSelection 1\r'),
-        'SelectorA_Ch2' : (b'SelectorA set sourceSelection 2\r'),
-        'SelectorA_Ch3' : (b'SelectorA set sourceSelection 3\r'),
-        'SelectorA_Ch4' : (b'SelectorA set sourceSelection 4\r'),
-        'SelectorA_Ch5' : (b'SelectorA set sourceSelection 5\r'),
-        'SelectorA_Ch6' : (b'SelectorA set sourceSelection 6\r'),
-        'SelectorA_Ch7' : (b'SelectorA set sourceSelection 7\r'),
-        'SelectorA_Ch8' : (b'SelectorA set sourceSelection 8\r'),
-        #-Router B
-        'SelectorB_Ch1' : (b'SelectorB set sourceSelection 1\r'),
-        'SelectorB_Ch2' : (b'SelectorB set sourceSelection 2\r'),
-        'SelectorB_Ch3' : (b'SelectorB set sourceSelection 3\r'),
-        'SelectorB_Ch4' : (b'SelectorB set sourceSelection 4\r'),
-        'SelectorB_Ch5' : (b'SelectorB set sourceSelection 5\r'),
-        'SelectorB_Ch6' : (b'SelectorB set sourceSelection 6\r'),
-        'SelectorB_Ch7' : (b'SelectorB set sourceSelection 7\r'),
-        'SelectorB_Ch8' : (b'SelectorB set sourceSelection 8\r'),
-        #-Router C
-        'SelectorC_Ch1' : (b'SelectorC set sourceSelection 1\r'),
-        'SelectorC_Ch2' : (b'SelectorC set sourceSelection 2\r'),
-        'SelectorC_Ch3' : (b'SelectorC set sourceSelection 3\r'),
-        'SelectorC_Ch4' : (b'SelectorC set sourceSelection 4\r'),
-        'SelectorC_Ch5' : (b'SelectorC set sourceSelection 5\r'),
-        'SelectorC_Ch6' : (b'SelectorC set sourceSelection 6\r'),
-        'SelectorC_Ch7' : (b'SelectorC set sourceSelection 7\r'),
-        'SelectorC_Ch8' : (b'SelectorC set sourceSelection 8\r'),
-        #-Router D
-        'SelectorD_Ch1' : (b'SelectorD set sourceSelection 1\r'),
-        'SelectorD_Ch2' : (b'SelectorD set sourceSelection 2\r'),
-        'SelectorD_Ch3' : (b'SelectorD set sourceSelection 3\r'),
-        'SelectorD_Ch4' : (b'SelectorD set sourceSelection 4\r'),
-        'SelectorD_Ch5' : (b'SelectorD set sourceSelection 5\r'),
-        'SelectorD_Ch6' : (b'SelectorD set sourceSelection 6\r'),
-        'SelectorD_Ch7' : (b'SelectorD set sourceSelection 7\r'),
-        'SelectorD_Ch8' : (b'SelectorD set sourceSelection 8\r'),
-        #-Router E
-        'SelectorE_Ch1' : (b'SelectorE set sourceSelection 1\r'),
-        'SelectorE_Ch2' : (b'SelectorE set sourceSelection 2\r'),
-        'SelectorE_Ch3' : (b'SelectorE set sourceSelection 3\r'),
-        'SelectorE_Ch4' : (b'SelectorE set sourceSelection 4\r'),
-        'SelectorE_Ch5' : (b'SelectorE set sourceSelection 5\r'),
-        'SelectorE_Ch6' : (b'SelectorE set sourceSelection 6\r'),
-        'SelectorE_Ch7' : (b'SelectorE set sourceSelection 7\r'),
-        'SelectorE_Ch8' : (b'SelectorE set sourceSelection 8\r'),
-        #-Subscribe Blocks
-        'Subscribe_A'   : (b'SelectorA subscribe sourceSelection RouteA 50\r'), #50 miliseconds
-        'Subscribe_B'   : (b'SelectorB subscribe sourceSelection RouteB 50\r'),
-        'Subscribe_C'   : (b'SelectorC subscribe sourceSelection RouteC 50\r'),
-        'Subscribe_D'   : (b'SelectorD subscribe sourceSelection RouteD 50\r'),
-        'Subscribe_E'   : (b'SelectorE subscribe sourceSelection RouteE 50\r'),
-        #-Unsubscribe Blocks
-        'Unsubscribe_A' : (b'SelectorA unsubscribe sourceSelection RouteA\r'),
-        'Unsubscribe_B' : (b'SelectorB unsubscribe sourceSelection RouteB\r'),
-        'Unsubscribe_C' : (b'SelectorC unsubscribe sourceSelection RouteC\r'),
-        'Unsubscribe_D' : (b'SelectorD unsubscribe sourceSelection RouteD\r'),
-        'Unsubscribe_E' : (b'SelectorE unsubscribe sourceSelection RouteE\r'),
-        #-Device info
-        'PollCommand'   : (b'DEVICE get hostname\r')
+    '''>>Data Dictionarie ---------------------------------------------------'''
+    Biamp_status = {
+        'Router'  : '',
+        'Channel' : '',
     }
 
-    '''>>Opening of Communications ------------------------------------------'''
+    '''>>Open Communications ------------------------------------------------'''
     Tesira.Connect()
 
     #Physical Ethernet Port Status
@@ -162,7 +105,7 @@ def AudioControl(IPCP, TLP, Tesira):
         Reconnecttime.Restart()
     Reconnecttime = Wait(60,TesiraAutoReconnect) #60s
     
-    #Physical Ethernet Port Tesira Connection Status
+    #Physical Ethernet Port Status
     @event(Tesira, 'Connected')
     @event(Tesira, 'Disconnected')
     def TesiraConnectionHandler(interface, state):
@@ -170,11 +113,11 @@ def AudioControl(IPCP, TLP, Tesira):
             #print('Tesira', state)
             BtnLANBiamp.SetState(1)
             '''>>Device Subscription ----------------------------------------'''
-            Tesira.Send(Tesira_Command['Subscribe_A'])
-            Tesira.Send(Tesira_Command['Subscribe_B'])
-            Tesira.Send(Tesira_Command['Subscribe_C'])
-            Tesira.Send(Tesira_Command['Subscribe_D'])
-            Tesira.Send(Tesira_Command['Subscribe_E'])
+            Tesira.Send(b'SelectorA subscribe sourceSelection RouteA 50\r')
+            Tesira.Send(b'SelectorB subscribe sourceSelection RouteB 50\r')
+            Tesira.Send(b'SelectorC subscribe sourceSelection RouteC 50\r')
+            Tesira.Send(b'SelectorD subscribe sourceSelection RouteD 50\r')
+            Tesira.Send(b'SelectorE subscribe sourceSelection RouteE 50\r')
             #--            
             interface.StartKeepAlive(5, (b'DEVICE get hostname\r'))
         elif state == 'Disconnected':
@@ -191,7 +134,7 @@ def AudioControl(IPCP, TLP, Tesira):
             CurrentResponse = data[:Position]
             data = data[Position+2:]
             CurrentResponse = (CurrentResponse.decode()).replace('\"','')
-            
+
             #>>Evaluate the clean data with RegEx '''
             if CurrentResponse[0] == '!':
                 ResponsePattern = re.compile(
@@ -199,16 +142,16 @@ def AudioControl(IPCP, TLP, Tesira):
                                   )
                 MatchObject = ResponsePattern.search(CurrentResponse)
                 if MatchObject:
-                    Selector = MatchObject.group(1)      #[A-E]
-                    Channel  = int(MatchObject.group(2)) #[0-8]
-                    print('Tesira Selector: {0} Channel: {1}'.format(Selector, Channel))
-                    #Biamp GUI Feedback Function
-                    TesiraStatus(Selector, Channel)
+                    Biamp_status['Router']  = MatchObject.group(1)      #[A-E] in Dictionary
+                    Biamp_status['Channel'] = int(MatchObject.group(2)) #[0-8] in Dictionary
+                    print('Tesira Selector: {0} Channel: {1}'.format(Biamp_status['Router'], Biamp_status['Channel']))
+                    '''Biamp GUI Feedback Function'''
+                    TesiraStatus(Biamp_status['Router'], Biamp_status['Channel'])
         pass
         
     '''>>Data Parsing to GUI from Connected Devices -------------------------'''
     def TesiraStatus(Selector, Channel):
-        if Selector == 'A' and Channel == 0:           
+        if Selector == 'A' and Channel == 0:
             for item in PageAudioA:
                 item.SetState(0)
         elif Selector == 'B' and Channel == 0:
@@ -236,164 +179,164 @@ def AudioControl(IPCP, TLP, Tesira):
     @event(PageAudio, ButtonEventList)
     def GroupAudioHandler(button, state):
         GroupAudio.SetCurrent(button)
-        if button is BtnSetA:
+        if button is BtnSetA and state == 'Pressed':
             TLP.ShowPopup('Audio_Sources_A')
             print("Audio Source Selector: %s" % 'A')
-        elif button is BtnSetB:
+        elif button is BtnSetB and state == 'Pressed':
             TLP.ShowPopup('Audio_Sources_B')
             print("Audio Source Selector: %s" % 'B')
-        elif button is BtnSetC:
+        elif button is BtnSetC and state == 'Pressed':
             TLP.ShowPopup('Audio_Sources_C')
             print("Audio Source Selector: %s" % 'C')
-        elif button is BtnSetD:
+        elif button is BtnSetD and state == 'Pressed':
             TLP.ShowPopup('Audio_Sources_D')
             print("Audio Source Selector: %s" % 'D')
-        elif button is BtnSetE:
+        elif button is BtnSetE and state == 'Pressed':
             TLP.ShowPopup('Audio_Sources_E')
             print("Audio Source Selector: %s" % 'E')
         pass
     
     @event(PageAudioA, ButtonEventList)
     def AudioSourceAHandler(button, state):
-        if button is BtnHDMI_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch1'])          
+        if button is BtnHDMI_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 1\r')
             print("Audio listen in Selector %s: %s" % ('A','HDMI'))
-        elif button is BtnPS4_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch2'])
+        elif button is BtnPS4_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 2\r')
             print("Audio listen in Selector %s: %s" % ('A','PS4'))
-        elif button is BtnXbox_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch3'])
+        elif button is BtnXbox_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 3\r')
             print("Audio listen in Selector %s: %s" % ('A','Xbox'))
-        elif button is BtnBluRay_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch4'])
+        elif button is BtnBluRay_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 4\r')
             print("Audio listen in Selector %s: %s" % ('A','Bluray'))
-        elif button is BtnSky_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch5'])
+        elif button is BtnSky_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 5\r')
             print("Audio listen in Selector %s: %s" % ('A','Sky'))
-        elif button is BtnRoku_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch6'])
+        elif button is BtnRoku_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 6\r')
             print("Audio listen in Selector %s: %s" % ('A','Roku'))
-        elif button is BtnPC_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch7'])
+        elif button is BtnPC_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 7\r')
             print("Audio listen in Selector %s: %s" % ('A','PC'))
-        elif button is BtnShare_A:
-            Tesira.Send(Tesira_Command['SelectorA_Ch8'])
+        elif button is BtnShare_A and state == 'Pressed':
+            Tesira.Send(b'SelectorA set sourceSelection 8\r')
             print("Audio listen in Selector %s: %s" % ('A','ClickShare'))
         GroupSetA.SetCurrent(button)
         pass
         
     @event(PageAudioB, ButtonEventList)
     def AudioSourceBHandler(button, state):
-        if button is BtnHDMI_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch1'])
+        if button is BtnHDMI_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 1\r')
             print("Audio listen in Selector %s: %s" % ('B','HDMI'))
-        elif button is BtnPS4_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch2'])
+        elif button is BtnPS4_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 2\r')
             print("Audio listen in Selector %s: %s" % ('B','PS4'))
-        elif button is BtnXbox_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch3'])
+        elif button is BtnXbox_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 3\r')
             print("Audio listen in Selector %s: %s" % ('B','Xbox'))
-        elif button is BtnBluRay_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch4'])
+        elif button is BtnBluRay_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 4\r')
             print("Audio listen in Selector %s: %s" % ('B','Bluray'))
-        elif button is BtnSky_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch5'])
+        elif button is BtnSky_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 5\r')
             print("Audio listen in Selector %s: %s" % ('B','Sky'))
-        elif button is BtnRoku_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch6'])
+        elif button is BtnRoku_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 6\r')
             print("Audio listen in Selector %s: %s" % ('B','Roku'))
-        elif button is BtnPC_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch7'])
+        elif button is BtnPC_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 7\r')
             print("Audio listen in Selector %s: %s" % ('B','PC'))
-        elif button is BtnShare_B:
-            Tesira.Send(Tesira_Command['SelectorB_Ch8'])
+        elif button is BtnShare_B and state == 'Pressed':
+            Tesira.Send(b'SelectorB set sourceSelection 8\r')
             print("Audio listen in Selector %s: %s" % ('B','ClickShare'))
         GroupSetB.SetCurrent(button)
         pass
     
     @event(PageAudioC, ButtonEventList)
     def AudioSourceCHandler(button, state):
-        if button is BtnHDMI_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch1'])
+        if button is BtnHDMI_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 1\r')
             print("Audio listen in Selector %s: %s" % ('C','HDMI'))
-        elif button is BtnPS4_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch2'])
+        elif button is BtnPS4_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 2\r')
             print("Audio listen in Selector %s: %s" % ('C','PS4'))
-        elif button is BtnXbox_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch3'])
+        elif button is BtnXbox_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 3\r')
             print("Audio listen in Selector %s: %s" % ('C','Xbox'))
-        elif button is BtnBluRay_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch4'])
+        elif button is BtnBluRay_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 4\r')
             print("Audio listen in Selector %s: %s" % ('C','Bluray'))
-        elif button is BtnSky_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch5'])
+        elif button is BtnSky_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 5\r')
             print("Audio listen in Selector %s: %s" % ('C','Sky'))
-        elif button is BtnRoku_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch6'])
+        elif button is BtnRoku_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 6\r')
             print("Audio listen in Selector %s: %s" % ('C','Roku'))
-        elif button is BtnPC_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch7'])
+        elif button is BtnPC_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 7\r')
             print("Audio listen in Selector %s: %s" % ('C','PC'))
-        elif button is BtnShare_C:
-            Tesira.Send(Tesira_Command['SelectorC_Ch8'])
+        elif button is BtnShare_C and state == 'Pressed':
+            Tesira.Send(b'SelectorC set sourceSelection 8\r')
             print("Audio listen in Selector %s: %s" % ('C','ClickShare'))
         GroupSetC.SetCurrent(button)
         pass
         
     @event(PageAudioD, ButtonEventList)
     def AudioSourceDHandler(button, state):
-        if button is BtnHDMI_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch1'])
+        if button is BtnHDMI_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 1\r')
             print("Audio listen in Selector %s: %s" % ('D','HDMI'))
-        elif button is BtnPS4_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch2'])
+        elif button is BtnPS4_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 2\r')
             print("Audio listen in Selector %s: %s" % ('D','PS4'))
-        elif button is BtnXbox_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch3'])
+        elif button is BtnXbox_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 3\r')
             print("Audio listen in Selector %s: %s" % ('D','Xbox'))
-        elif button is BtnBluRay_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch4'])
+        elif button is BtnBluRay_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 4\r')
             print("Audio listen in Selector %s: %s" % ('D','Bluray'))
-        elif button is BtnSky_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch5'])
+        elif button is BtnSky_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 5\r')
             print("Audio listen in Selector %s: %s" % ('D','Sky')) 
-        elif button is BtnRoku_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch6'])
+        elif button is BtnRoku_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 6\r')
             print("Audio listen in Selector %s: %s" % ('D','Roku'))
-        elif button is BtnPC_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch7'])
+        elif button is BtnPC_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 7\r')
             print("Audio listen in Selector %s: %s" % ('D','PC'))
-        elif button is BtnShare_D:
-            Tesira.Send(Tesira_Command['SelectorD_Ch8'])
+        elif button is BtnShare_D and state == 'Pressed':
+            Tesira.Send(b'SelectorD set sourceSelection 8\r')
             print("Audio listen in Selector %s: %s" % ('D','ClickShare'))
         GroupSetD.SetCurrent(button)
         pass
     
     @event(PageAudioE, ButtonEventList)
     def AudioSourceEHandler(button, state):
-        if button is BtnHDMI_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch1'])
+        if button is BtnHDMI_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 1\r')
             print("Audio listen in Selector %s: %s" % ('E','HDMI'))
-        elif button is BtnPS4_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch2'])
+        elif button is BtnPS4_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 2\r')
             print("Audio listen in Selector %s: %s" % ('E','PS4'))
-        elif button is BtnXbox_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch3'])
+        elif button is BtnXbox_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 3\r')
             print("Audio listen in Selector %s: %s" % ('E','Xbox'))
-        elif button is BtnBluRay_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch4'])
+        elif button is BtnBluRay_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 4\r')
             print("Audio listen in Selector %s: %s" % ('E','Bluray'))
-        elif button is BtnSky_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch5'])
+        elif button is BtnSky_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 5\r')
             print("Audio listen in Selector %s: %s" % ('E','Sky'))
-        elif button is BtnRoku_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch6'])
+        elif button is BtnRoku_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 6\r')
             print("Audio listen in Selector %s: %s" % ('E','Roku'))
-        elif button is BtnPC_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch7'])
+        elif button is BtnPC_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 7\r')
             print("Audio listen in Selector %s: %s" % ('E','PC'))
-        elif button is BtnShare_E:
-            Tesira.Send(Tesira_Command['SelectorE_Ch8'])
+        elif button is BtnShare_E and state == 'Pressed':
+            Tesira.Send(b'SelectorE set sourceSelection 8\r')
             print("Audio listen in Selector %s: %s" % ('E','ClickShare'))
         GroupSetE.SetCurrent(button)
         pass

@@ -72,65 +72,65 @@ def VideoControl(IPCP, TLP, Quantum):
     '''>>User Button Events -------------------------------------------------'''
     @event(PageVW, ButtonEventList)
     def VideoSourceHandler(button, state):
-        if button is BtnVWHDMI:
+        if button is BtnVWHDMI and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset1'])
             print("Video Full in Videowall: %s" % 'HDMI')
-        elif button is BtnVWPS4:
+        elif button is BtnVWPS4 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset2'])
             print("Video Full in Videowall: %s" % 'PS4')
-        elif button is BtnVWXbox:
+        elif button is BtnVWXbox and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset3'])
             print("Video Full in Videowall: %s" % 'Xbox')
-        elif button is BtnVWBluRay:
+        elif button is BtnVWBluRay and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset4'])
             print("Video Full in Videowall: %s" % 'Bluray')
-        elif button is BtnVWSky:
+        elif button is BtnVWSky and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset5'])
             print("Video Full in Videowall: %s" % 'Sky')
-        elif button is BtnVWRoku:
+        elif button is BtnVWRoku and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset6'])
             print("Video Full in Videowall: %s" % 'Roku')
-        elif button is BtnVWPC:
+        elif button is BtnVWPC and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset7'])
             print("Video Full in Videowall: %s" % 'PC')
-        elif button is BtnVWShare:
+        elif button is BtnVWShare and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset8'])
             print("Video Full in Videowall: %s" % 'ClickShare')
         pass
 
     @event(PageVWP, ButtonEventList)
     def VideoPresetHandler(button, state):
-        if button is BtnVWP1:
+        if button is BtnVWP1 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset9'])
             print("Video Preset in Videowall: %s" % '1')
-        elif button is BtnVWP2:
+        elif button is BtnVWP2 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset10'])
             print("Video Preset in Videowall: %s" % '2')
-        elif button is BtnVWP3:
+        elif button is BtnVWP3 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset11'])
             print("Video Preset in Videowall: %s" % '3')
-        elif button is BtnVWP4:
+        elif button is BtnVWP4 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset12'])
             print("Video Preset in Videowall: %s" % '4')
-        elif button is BtnVWP5:
+        elif button is BtnVWP5 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset13'])
             print("Video Preset in Videowall: %s" % '5')
-        elif button is BtnVWP6:
+        elif button is BtnVWP6 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset14'])
             print("Video Preset in Videowall: %s" % '6')
-        elif button is BtnVWP7:
+        elif button is BtnVWP7 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset15'])
             print("Video Preset in Videowall: %s" % '7')
-        elif button is BtnVWP8:
+        elif button is BtnVWP8 and state == 'Pressed':
             Quantum.Send(Quantum_Command['Preset16'])
             print("Video Preset in Videowall: %s" % '8')
         pass
 
     @event(PageVWPower, ButtonEventList)
     def VideoPowerHandler(button, state):
-        if button is BtnVWPower1:
+        if button is BtnVWPower1 and state == 'Pressed':
             print("Video Display in Videowall: %s" % 'Powered On')
-        elif button is BtnVWPower0:
+        elif button is BtnVWPower0 and state == 'Pressed':
             print("Video Display in Videowall: %s" % 'Powered Off')
         pass
     pass

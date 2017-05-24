@@ -13,8 +13,6 @@ from extronlib.system import Clock, MESet, Wait
 IPCP    = ProcessorDevice('IPlink')
 TLP     = UIDevice('TouchPanel')
 #--
-Denon   = SerialInterface(IPCP, 'COM1', Baud=9600, Data=8, Parity='None',
-                          Stop=1, FlowControl='Off', CharDelay=0, Mode='RS232')
 LCDs    = SerialInterface(IPCP, 'COM2', Baud=9600, Data=8, Parity='None',
                           Stop=1, FlowControl='Off', CharDelay=0, Mode='RS232')
 #--
@@ -28,6 +26,8 @@ Tesira  = EthernetClientInterface('192.168.10.150', 22, 'SSH',
 from Audio import AudioControl
 from Video import VideoControl
 from Bluray import BlurayControl
+import deno_dvd_DBT3313UD_Series_v1_0_2_0 as DenonSerial
+Denon = DenonSerial.SerialClass(IPCP, 'COM1', Baud=9600, Model='DBT-3313UD')
 ## End User Import -------------------------------------------------------------
 ##
 ## Begin Device/User Interface Definition --------------------------------------
@@ -58,7 +58,7 @@ ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
 ##
 ## Begin Communication Interface Definition ------------------------------------
 ## End Communication Interface Definition --------------------------------------
-def Initialize():    
+def Initialize():
     print(ProgramInfo)
     print("System Initialize")
     pass
@@ -88,13 +88,19 @@ def GroupModeHandler(button, state):
         print('Touch Mode: %s' % ('Audio'))
     #--
     elif button is BtnBluRay and state == 'Pressed':
-        Denon.Send(b'PW?\r')
+        #Denon.ReadStatus('Power')
+        #Denon.ReadStatus('PlaybackStatus')
+        #Denon.ReadStatus('CurrentChapterTrackNum')
+        #Denon.ReadStatus('DiscTypeStatus')
+        #--
         LblMaster.SetText('Control de BluRay')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('BR')
         print('Touch Mode: %s' % ('Bluray'))
     #--
     elif button is BtnStatus and state == 'Pressed':
+        #Denon.ReadStatus('ConnectionStatus')
+        #--
         LblMaster.SetText('Información de dispositivos')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('Status')
@@ -108,19 +114,13 @@ def GroupModeHandler(button, state):
     #--
     pass
 
-# Power Page ------------------------------------------------------------------- 
+# Power Page -------------------------------------------------------------------
 @event(BtnAllOff, ButtonEventList)
 def PowerSystemHandler(button, state):
-    #--
-    if state == 'Held':
-        #-Tesira Unsubscribe-----
-        Tesira.Send(Tesira_Command['Unsubscribe_A'])
-        Tesira.Send(Tesira_Command['Unsubscribe_B'])
-        Tesira.Send(Tesira_Command['Unsubscribe_C'])
-        Tesira.Send(Tesira_Command['Unsubscribe_D'])
-        Tesira.Send(Tesira_Command['Unsubscribe_E'])        
-        
-        #Denon.Send(Denon_Command['PowerOff'])
+    if state == 'Pressed':
+        print("Button PowerOff Pressed")
+    if state == 'Held':       
+        Denon.Set('Power','Off')
         TLP.ShowPage('Index')
         print("Power System Held")
     pass

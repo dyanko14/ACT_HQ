@@ -41,26 +41,26 @@ BtnStatus   = Button(TLP, 5)
 BtnPowerOff = Button(TLP, 6)
 LblMaster   = Label(TLP, 300)
 ## Video
-BtnVWHDMI   = Button(TLP, 11)
-BtnVWPS4    = Button(TLP, 12)
-BtnVWXbox   = Button(TLP, 13)
-BtnVWBluRay = Button(TLP, 14)
-BtnVWSky    = Button(TLP, 15)
-BtnVWRoku   = Button(TLP, 16)
-BtnVWPC     = Button(TLP, 17)
-BtnVWShare  = Button(TLP, 18)
+BtnVHDMI   = Button(TLP, 11)
+BtnVPS4    = Button(TLP, 12)
+BtnVXbox   = Button(TLP, 13)
+BtnVBluRay = Button(TLP, 14)
+BtnVSky    = Button(TLP, 15)
+BtnVRoku   = Button(TLP, 16)
+BtnVPC     = Button(TLP, 17)
+BtnVShare  = Button(TLP, 18)
 ## Video - Presets
-BtnVWP1     = Button(TLP, 21)
-BtnVWP2     = Button(TLP, 22)
-BtnVWP3     = Button(TLP, 23)
-BtnVWP4     = Button(TLP, 24)
-BtnVWP5     = Button(TLP, 25)
-BtnVWP6     = Button(TLP, 26)
-BtnVWP7     = Button(TLP, 27)
-BtnVWP8     = Button(TLP, 28)
+BtnVP1     = Button(TLP, 21)
+BtnVP2     = Button(TLP, 22)
+BtnVP3     = Button(TLP, 23)
+BtnVP4     = Button(TLP, 24)
+BtnVP5     = Button(TLP, 25)
+BtnVP6     = Button(TLP, 26)
+BtnVP7     = Button(TLP, 27)
+BtnVP8     = Button(TLP, 28)
 ## Video - Power
-BtnVWPower1 = Button(TLP, 30)
-BtnVWPower0 = Button(TLP, 31)
+BtnVWPwr1 = Button(TLP, 30)
+BtnVWPwr0 = Button(TLP, 31)
 ## Audio - Set
 BtnSetA     = Button(TLP, 41)
 BtnSetB     = Button(TLP, 42)
@@ -148,31 +148,31 @@ BtnAllOff   = Button(TLP, 220, holdTime = 3)
 LblAllOff   = Label(TLP, 221)
 
 #--
-PageMain    = [BtnVideo, BtnAudio, BtnBluRay, BtnStatus, BtnPowerOff]
-GroupModes  = MESet([BtnIndex, BtnVideo, BtnAudio, BtnBluRay, BtnStatus, BtnPowerOff])
+PageMain   = [BtnVideo, BtnAudio, BtnBluRay, BtnStatus, BtnPowerOff]
+GroupMode  = MESet([BtnIndex, BtnVideo, BtnAudio, BtnBluRay, BtnStatus, BtnPowerOff])
 #--
-PageVW      = [BtnVWHDMI, BtnVWPS4, BtnVWXbox, BtnVWBluRay, BtnVWSky, BtnVWRoku, BtnVWPC, BtnVWShare]
-PageVWP     = [BtnVWP1, BtnVWP2, BtnVWP3, BtnVWP4, BtnVWP5, BtnVWP6, BtnVWP7, BtnVWP8]
-PageVWPower = [BtnVWPower1, BtnVWPower0]
+PageVW     = [BtnVHDMI, BtnVPS4, BtnVXbox, BtnVBluRay, BtnVSky, BtnVRoku, BtnVPC, BtnVShare]
+PageVWP    = [BtnVP1, BtnVP2, BtnVP3, BtnVP4, BtnVP5, BtnVP6, BtnVP7, BtnVP8]
+PageVWPwr  = [BtnVWPwr1, BtnVWPwr0]
 #--
-PageAudio   = [BtnSetA, BtnSetB, BtnSetC, BtnSetD, BtnSetE]
-PageAudioA  = [BtnHDMI_A, BtnPS4_A, BtnXbox_A, BtnBluRay_A, BtnSky_A, BtnRoku_A, BtnPC_A, BtnShare_A]
-PageAudioB  = [BtnHDMI_B, BtnPS4_B, BtnXbox_B, BtnBluRay_B, BtnSky_B, BtnRoku_B, BtnPC_B, BtnShare_B]
-PageAudioC  = [BtnHDMI_C, BtnPS4_C, BtnXbox_C, BtnBluRay_C, BtnSky_C, BtnRoku_C, BtnPC_C, BtnShare_C]
-PageAudioD  = [BtnHDMI_D, BtnPS4_D, BtnXbox_D, BtnBluRay_D, BtnSky_D, BtnRoku_D, BtnPC_D, BtnShare_D]
-PageAudioE  = [BtnHDMI_E, BtnPS4_E, BtnXbox_E, BtnBluRay_E, BtnSky_E, BtnRoku_E, BtnPC_E, BtnShare_E]
+PageAudio  = [BtnSetA, BtnSetB, BtnSetC, BtnSetD, BtnSetE]
+PageAudioA = [BtnHDMI_A, BtnPS4_A, BtnXbox_A, BtnBluRay_A, BtnSky_A, BtnRoku_A, BtnPC_A, BtnShare_A]
+PageAudioB = [BtnHDMI_B, BtnPS4_B, BtnXbox_B, BtnBluRay_B, BtnSky_B, BtnRoku_B, BtnPC_B, BtnShare_B]
+PageAudioC = [BtnHDMI_C, BtnPS4_C, BtnXbox_C, BtnBluRay_C, BtnSky_C, BtnRoku_C, BtnPC_C, BtnShare_C]
+PageAudioD = [BtnHDMI_D, BtnPS4_D, BtnXbox_D, BtnBluRay_D, BtnSky_D, BtnRoku_D, BtnPC_D, BtnShare_D]
+PageAudioE = [BtnHDMI_E, BtnPS4_E, BtnXbox_E, BtnBluRay_E, BtnSky_E, BtnRoku_E, BtnPC_E, BtnShare_E]
 #--
-GroupAudio  = MESet([BtnSetA, BtnSetB, BtnSetC, BtnSetD, BtnSetE])
-GroupSetA   = MESet(PageAudioA)
-GroupSetB   = MESet(PageAudioB)
-GroupSetC   = MESet(PageAudioC)
-GroupSetD   = MESet(PageAudioD)
-GroupSetE   = MESet(PageAudioE)
+GroupAudio = MESet([BtnSetA, BtnSetB, BtnSetC, BtnSetD, BtnSetE])
+GroupSetA  = MESet(PageAudioA)
+GroupSetB  = MESet(PageAudioB)
+GroupSetC  = MESet(PageAudioC)
+GroupSetD  = MESet(PageAudioD)
+GroupSetE  = MESet(PageAudioE)
 #--
-PageBRNav   = [BtnBRUp, BtnBRLeft, BtnBRDown, BtnBRRight, BtnBREnter]
-PageBROpt   = [BtnBRPopup, BtnBRSetup, BtnBRInfo, BtnBRReturn, BtnBRTray, BtnBRPower]
-PageBRPlay  = [BtnBRPrev, BtnBRBack, BtnBRPause, BtnBRPlay, BtnBRStop, BtnBRRewi, BtnBRNext]
-GroupPlay   = MESet(PageBRPlay)
+PageBRNav  = [BtnBRUp, BtnBRLeft, BtnBRDown, BtnBRRight, BtnBREnter]
+PageBROpt  = [BtnBRPopup, BtnBRSetup, BtnBRInfo, BtnBRReturn, BtnBRTray, BtnBRPower]
+PageBRPlay = [BtnBRPrev, BtnBRBack, BtnBRPause, BtnBRPlay, BtnBRStop, BtnBRRewi, BtnBRNext]
+GroupPlay  = MESet(PageBRPlay)
 #--
 ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
 
@@ -184,7 +184,10 @@ def Initialize():
     Tesira.Connect()
     Denon.Initialize()
     #--
+    GroupMode.SetCurrent(None)
+    TLP.HidePopupGroup(2)
     TLP.ShowPage('Index')
+    TLP.ShowPopup('Welcome')
     print("System Initialize")
     pass
 
@@ -215,9 +218,10 @@ def TesiraParser(interface, data):
                               )
             MatchObject = ResponsePattern.search(CurrentResponse)
             if MatchObject:
-                Biamp_status['Router']  = MatchObject.group(1)      #[A-E] in Dictionary
-                Biamp_status['Channel'] = int(MatchObject.group(2)) #[0-8] in Dictionary
-                print('Tesira Selector: {0} Channel: {1}'.format(Biamp_status['Router'], Biamp_status['Channel']))
+                Biamp_status['Router']  = MatchObject.group(1)      #[A-E]
+                Biamp_status['Channel'] = int(MatchObject.group(2)) #[0-8]
+                print('Parser: {0}-{1}'.format(Biamp_status['Router'], 
+                                                       Biamp_status['Channel']))
                 '''Biamp GUI Feedback Function'''
                 TesiraStatus(Biamp_status['Router'], Biamp_status['Channel'])
     pass
@@ -246,7 +250,11 @@ def TesiraStatus(Selector, Channel):
         GroupSetD.SetCurrent(PageAudioD[Channel])
         GroupSetE.SetCurrent(PageAudioE[Channel])
     pass
-
+#--
+@event(Denon, 'ReceiveData')
+def DenonParser(interface, data):
+    LblMaster.SetText(str(data))
+    pass
 ## Event Definitions -----------------------------------------------------------
 '''PANEL - ROOM .............................................................'''
 ## Index Page ------------------------------------------------------------------
@@ -260,7 +268,7 @@ def ButtonObjectPressed(button, state):
 @event(PageMain, ButtonEventList)
 def GroupModeHandler(button, state):
     #--
-    GroupModes.SetCurrent(button)
+    GroupMode.SetCurrent(button)
     #--
     if button is BtnVideo and state == 'Pressed':
         LblMaster.SetText('Proyección de Video')
@@ -275,6 +283,18 @@ def GroupModeHandler(button, state):
         print('Touch Mode: %s' % 'Audio')
     #--
     elif button is BtnBluRay and state == 'Pressed':
+        #Query Data from Device
+        QPWdResponse = (Denon.SendAndWait(b'PW?\r', 1)).decode()
+        if 'PW ON' in QPWdResponse:
+            Denon_Status['Power'] = 'On'
+            BtnBRPower.SetState(1)
+        elif 'PW OFF' in QPWdResponse:
+            Denon_Status['Power'] = 'Off'
+            BtnBRPower.SetState(0)
+        print(QPWdResponse)
+        QPlayResponse = (Denon.SendAndWait(b'PS?\r', 1)).decode()
+        print(QPlayResponse)
+        #--
         LblMaster.SetText('Control de BluRay')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('BR')
@@ -297,49 +317,49 @@ def GroupModeHandler(button, state):
 ## Video Page ------------------------------------------------------------------
 @event(PageVW, ButtonEventList)
 def VideoSourceHandler(button, state):
-    if button is BtnVWHDMI and state == 'Pressed':
+    if button is BtnVHDMI and state == 'Pressed':
         print("Videowall Full: %s" % 'HDMI')
-    elif button is BtnVWPS4 and state == 'Pressed':
+    elif button is BtnVPS4 and state == 'Pressed':
         print("Videowall Full: %s" % 'PS4')
-    elif button is BtnVWXbox and state == 'Pressed':
+    elif button is BtnVXbox and state == 'Pressed':
         print("Videowall Full: %s" % 'Xbox')
-    elif button is BtnVWBluRay and state == 'Pressed':
+    elif button is BtnVBluRay and state == 'Pressed':
         print("Videowall Full: %s" % 'Bluray')
-    elif button is BtnVWSky and state == 'Pressed':
+    elif button is BtnVSky and state == 'Pressed':
         print("Videowall Full: %s" % 'Sky')
-    elif button is BtnVWRoku and state == 'Pressed':
+    elif button is BtnVRoku and state == 'Pressed':
         print("Videowall Full: %s" % 'Roku')
-    elif button is BtnVWPC and state == 'Pressed':
+    elif button is BtnVPC and state == 'Pressed':
         print("Videowall Full: %s" % 'PC')
-    elif button is BtnVWShare and state == 'Pressed':
+    elif button is BtnVShare and state == 'Pressed':
         print("Videowall Full: %s" % 'Share')
     pass
 #--
 @event(PageVWP, ButtonEventList)
 def VideoPresetHandler(button, state):
-    if button is BtnVWP1 and state == 'Pressed':
+    if button is BtnVP1 and state == 'Pressed':
         print("Videowall Preset: %s" % '1')
-    elif button is BtnVWP2 and state == 'Pressed':
+    elif button is BtnVP2 and state == 'Pressed':
         print("Videowall Preset: %s" % '2')
-    elif button is BtnVWP3 and state == 'Pressed':
+    elif button is BtnVP3 and state == 'Pressed':
         print("Videowall Preset: %s" % '3')
-    elif button is BtnVWP4 and state == 'Pressed':
+    elif button is BtnVP4 and state == 'Pressed':
         print("Videowall Preset: %s" % '4')
-    elif button is BtnVWP5 and state == 'Pressed':
+    elif button is BtnVP5 and state == 'Pressed':
         print("Videowall Preset: %s" % '5')
-    elif button is BtnVWP6 and state == 'Pressed':
+    elif button is BtnVP6 and state == 'Pressed':
         print("Videowall Preset: %s" % '6')
-    elif button is BtnVWP7 and state == 'Pressed':
+    elif button is BtnVP7 and state == 'Pressed':
         print("Videowall Preset: %s" % '7')
-    elif button is BtnVWP8 and state == 'Pressed':
+    elif button is BtnVP8 and state == 'Pressed':
         print("Videowall Preset: %s" % '8')
     pass
 #--
-@event(PageVWPower, ButtonEventList)
+@event(PageVWPwr, ButtonEventList)
 def VideoPowerHandler(button, state):
-    if button is BtnVWPower1 and state == 'Pressed':
+    if button is BtnVWPwr1 and state == 'Pressed':
         print("Videowall: %s" % 'PwrOn')
-    elif button is BtnVWPower0 and state == 'Pressed':
+    elif button is BtnVWPwr0 and state == 'Pressed':
         print("Videowall: %s" % 'PwrOff')
     pass
 pass
@@ -391,7 +411,6 @@ def AudioSourceAHandler(button, state):
     elif button is BtnShare_A and state == 'Pressed':
         Tesira.Send(b'SelectorA set sourceSelection 8\r')
         print("Audio on Set %s: %s" % ('A','Share'))
-    GroupSetA.SetCurrent(button)
     pass
 #--
 @event(PageAudioB, ButtonEventList)
@@ -420,7 +439,6 @@ def AudioSourceBHandler(button, state):
     elif button is BtnShare_B and state == 'Pressed':
         Tesira.Send(b'SelectorB set sourceSelection 8\r')
         print("Audio on Set %s: %s" % ('B','Share'))
-    GroupSetB.SetCurrent(button)
     pass
 #--
 @event(PageAudioC, ButtonEventList)
@@ -449,7 +467,6 @@ def AudioSourceCHandler(button, state):
     elif button is BtnShare_C and state == 'Pressed':
         Tesira.Send(b'SelectorC set sourceSelection 8\r')
         print("Audio on Set %s: %s" % ('C','Share'))
-    GroupSetC.SetCurrent(button)
     pass
 #--
 @event(PageAudioD, ButtonEventList)
@@ -478,7 +495,6 @@ def AudioSourceDHandler(button, state):
     elif button is BtnShare_D and state == 'Pressed':
         Tesira.Send(b'SelectorD set sourceSelection 8\r')
         print("Audio on Set %s: %s" % ('D','Share'))
-    GroupSetD.SetCurrent(button)
     pass
 #--
 @event(PageAudioE, ButtonEventList)
@@ -507,7 +523,6 @@ def AudioSourceEHandler(button, state):
     elif button is BtnShare_E and state == 'Pressed':
         Tesira.Send(b'SelectorE set sourceSelection 8\r')
         print("Audio on Set %s: %s" % ('E','Share'))
-    GroupSetE.SetCurrent(button)
     pass
 ## Bluray Page -----------------------------------------------------------------
 @event(PageBRNav, ButtonEventList)
@@ -536,41 +551,36 @@ def BROptionHandler(button, state):
         #Denon.Set('MenuCall','Top Menu')
         BtnBRPopup.SetState(1)
         print("BluRay Pressed: %s" % 'Menu')
-    elif button is BtnBRPopup and state == 'Released':
+    else:
         BtnBRPopup.SetState(0)
-        print("BluRay Released: %s" % 'Menu')
     #--
     if button is BtnBRSetup and state == 'Pressed':
         #Denon.Set('Function','Setup')
         BtnBRSetup.SetState(1)
         print("BluRay Pressed: %s" % 'Title')
-    elif button is BtnBRSetup and state == 'Released':
+    else:
         BtnBRSetup.SetState(0)
-        print("BluRay Released: %s" % 'Title')
     #--
     if button is BtnBRInfo and state == 'Pressed':
         #Denon.Set('Function','Display')
         BtnBRInfo.SetState(1)
         print("BluRay Pressed: %s" % 'Info')
-    elif button is BtnBRInfo and state == 'Released':
+    else:
         BtnBRInfo.SetState(0)
-        print("BluRay Released: %s" % 'Info')
     #--
     if button is BtnBRReturn and state == 'Pressed':
         #Denon.Set('MenuNavigation','Return')
         BtnBRReturn.SetState(1)
         print("BluRay Pressed: %s" % 'Return')
-    elif button is BtnBRReturn and state == 'Released':
+    else:
         BtnBRReturn.SetState(0)
-        print("BluRay Released: %s" % 'Return')
     #--
     if button is BtnBRTray and state == 'Pressed':
         #Denon.Set('Transport','Eject')
         BtnBRTray.SetState(1)
         print("BluRay Pressed: %s" % 'Tray')
-    elif button is BtnBRTray and state == 'Released':
+    else:
         BtnBRTray.SetState(0)
-        print("BluRay Released: %s" % 'Tray')
     #--
     if button is BtnBRPower and state == 'Pressed':
         print("BluRay Pressed: %s" % 'Power')
@@ -590,14 +600,17 @@ def BRPlayHandler(button, state):
     #--
     if button is BtnBRPause and state == 'Pressed':
         #Denon.Set('Transport','Pause')
+        Denon.Send(b'KYPAUS\r')
         print("BluRay Pressed: %s" % 'Pause')
     #--
     if button is BtnBRPlay and state == 'Pressed':
         #Denon.Set('Transport','Play')
+        Denon.Send(b'KYPLAY\r')
         print("BluRay Pressed: %s" % 'Play')
     #--
     if button is BtnBRStop and state == 'Pressed':
         #Denon.Set('Transport','Stop')
+        Denon.Send(b'KYSTOP\r')
         print("BluRay Pressed: %s" % 'Stop')
     #--
     if button is BtnBRRewi and state == 'Pressed':
@@ -634,6 +647,23 @@ def TesiraConnectionHandler(interface, state):
     elif state == 'Disconnected':
         #print('Tesira', state)
         BtnLANBiamp.SetState(0)
+        interface.StopKeepAlive()
+        
+def DenonAutoReconnect():
+    Denon.Initialize()      
+    Reconnecttime.Restart()
+Reconnecttime = Wait(60,DenonAutoReconnect) #60s
+
+#Physical Ethernet Port Status
+@event(Denon, ['Online', 'Offline'])
+def DenonConnectionHandler(interface, state):
+    if state == 'Online':
+        print('Denon', state)
+        Btn232Denon.SetState(1)
+        interface.StartKeepAlive(5, (b'PW?\r'))
+    elif state == 'Offline':
+        print('Denon', state)
+        Btn232Denon.SetState(0)
         interface.StopKeepAlive()
 ## Power Page ------------------------------------------------------------------
 @event(BtnAllOff, ButtonEventList)

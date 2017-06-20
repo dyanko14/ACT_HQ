@@ -151,14 +151,17 @@ BtnBRInfo   = Button(TLP, 145)
 BtnBRReturn = Button(TLP, 146)
 BtnBRTray   = Button(TLP, 148)
 BtnBRPower  = Button(TLP, 150)
+LblBRDisk   = Label(TLP, 151)
+
 ## Page Status
 BtnLANBiamp = Button(TLP, 201)
 BtnLANVWall = Button(TLP, 202)
 BtnLANIPCP  = Button(TLP, 203)
 Btn232Denon = Button(TLP, 204)
 ## Page PowerOff
-BtnAllOff   = Button(TLP, 220, holdTime = 3)
+BtnPowerAll = Button(TLP, 220, repeatTime = 1)
 LblAllOff   = Label(TLP, 221)
+LblCountAll = Label(TLP, 222)
 ## Button Grouping -------------------------------------------------------------
 ## Group Page Main
 PageMain   = [BtnVideo, BtnAudio, BtnBluRay, BtnStatus, BtnPowerOff]
@@ -195,8 +198,14 @@ def Initialize():
     #Biamp.Connect()
     Denon.Initialize()
     
+    ## Power Page Counter Variable
+    global PwrCount
+    PwrCount = 0
+    
     ## Denon Subscribe Commands
     Denon.SubscribeStatus('ConnectionStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('CurrentChapterTrackNum',None,Denon_Parsing)
+    Denon.SubscribeStatus('CurrentTitleAlbumNum',None,Denon_Parsing)
     Denon.SubscribeStatus('DiscTypeStatus',None,Denon_Parsing)
     Denon.SubscribeStatus('PlaybackStatus',None,Denon_Parsing)
     Denon.SubscribeStatus('Power',None,Denon_Parsing)
@@ -252,27 +261,42 @@ def Quantum_Parsing(command,value,qualifier):
 
     elif command == 'DeviceStatus':
         Quantum_Data['DeviceStatus'] = value ##Store the value in Dictionary
+        print('Parsing Quantum Device: ' + Quantum_Data['DeviceStatus'])
     
     pass
 
 ## Data Parsing Functions - Serial Controlled Devices --------------------------
 def Denon_Parsing(command,value,qualifier):
-
+    
     if command == 'ConnectionStatus':
         if value == 'Connected':
-            Denon_Data['Conex'] = 'Connected'
+            Denon_Data['Conex'] = 'Connected' ##Store the value in Dictionary
             Btn232Denon.SetState(1)
         elif value == 'Disconnected':
-            Denon_Data['Conex'] = 'Disconnected'
+            Denon_Data['Conex'] = 'Disconnected' ##Store the value in Dictionary
             Btn232Denon.SetState(0)
-    
+
+    elif command == 'CurrentChapterTrackNum':
+        Denon_Data['Chapter'] = value ##Store the value in Dictionary
+        ## Send the new data to GUI BluRay Label
+        LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
+        print('Parsing Denon Chapter: ' + str(Denon_Data['Chapter']))
+
+    elif command == 'CurrentTitleAlbumNum':
+        Denon_Data['Title'] = value ##Store the value in Dictionary
+        ## Send the new data to GUI BluRay Label
+        LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
+        print('Parsing Denon Title:' + str(Denon_Data['Title']))
+
     elif command == 'DiscTypeStatus':
-        Denon_Data['DiscType'] = value
-        print(Denon_Data['DiscType'])
-        
+        Denon_Data['DiscType'] = value ##Store the value in Dictionary
+        ## Send the new data to GUI BluRay Label
+        LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
+        print('Parsing Denon Disk:' + Denon_Data['DiscType'])
+ 
     elif command == 'PlaybackStatus':
         Denon_Data['PlaybackStatus'] = value ##Store the value in Dictionary
-        print(Denon_Data['PlaybackStatus'])
+        print('Parsing Denon Play:' + Denon_Data['PlaybackStatus'])
         if value == 'Fast Reverse':
             GroupPlay.SetCurrent(BtnBRBack)
         elif value == 'Playing':
@@ -290,7 +314,7 @@ def Denon_Parsing(command,value,qualifier):
 
     elif command == 'Power':
         Denon_Data['Power'] = value ##Store the value in Dictionary
-        print(Denon_Data['Power'])
+        print('Parsing Denon Power:' + Denon_Data['Power'])
         if value == 'On':
             Denon_Data['Power'] = 'On'
             BtnBRPower.SetState(1)
@@ -313,9 +337,11 @@ Quantum_Data = {
 ## Data dictionaries - Serial Controlled Devices -------------------------------
 Denon_Data = {
     'Conex'          : '',
+    'Chapter'        : '',
     'DiscType'       : '',
     'PlaybackStatus' : '',
     'Power'          : '',
+    'Title'          : '',
 }
 ## Event Definitions -----------------------------------------------------------
 ## This section define all actions that a user triggers through the buttons ----
@@ -346,13 +372,19 @@ def MainEvents(button, state):
 
     elif button is BtnBluRay and state == 'Pressed':
         ## Query for Information
-        Denon.Update('Power')
-        Denon.Update('PlaybackStatus')
+        Denon.Update('CurrentChapterTrackNum')
+        Denon.Update('CurrentTitleAlbumNum')
         Denon.Update('DiscTypeStatus')
-        print('-> Data Denon Powr: ' + Denon_Data['Power'])
-        print('-> Data Denon Play: ' + Denon_Data['PlaybackStatus'])
+        Denon.Update('PlaybackStatus')
+        Denon.Update('Power')
+        ## Notify to Console
+        print('-> Data Denon Chap: ' + str(Denon_Data['Chapter']))
+        print('-> Data Denon Titl: ' + str(Denon_Data['Title']))
         print('-> Data Denon Disk: ' + Denon_Data['DiscType'])
+        print('-> Data Denon Play: ' + Denon_Data['PlaybackStatus'])
+        print('-> Data Denon Powr: ' + Denon_Data['Power'])
         
+        LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
         LblMaster.SetText('Control de BluRay')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('BR')
@@ -713,16 +745,35 @@ def BRPlayEvents(button, state):
 ## Status Page -----------------------------------------------------------------
 
 ## Power Page ------------------------------------------------------------------
-@event(BtnAllOff, ButtonEventList)
-def PowerSystemEvents(button, state):
-    #--
+@event(BtnPowerAll, ButtonEventList)
+def PowerEvents(button, state):   
+    global PwrCount
+    ## If the user press the Power Button:
+    ## Only Turn On the first state of button - Does not do any action
     if state == 'Pressed':
-        print("Button PowerOff Pressed")
-    #--
-    elif state == 'Held':
-        Denon.Send(b'KYPW OF\r')
-        TLP.ShowPage('Index')
-        print("Power System Held")
+        BtnPowerAll.SetState(1)
+        print('Button Pressed: %s' % 'PowerAll')
+    ## If the user holds down the button:
+    ## A variable is incremented up to 4 seconds
+    ## In each new value, Turn On each visual state of the Power Button
+    ## Whne the value is equal to 4, ShutDown all devices in the System
+    elif state == 'Repeated':
+        PwrCount = PwrCount + 1
+        BtnPowerAll.SetState(PwrCount)
+        LblCountAll.SetText(str(PwrCount))
+        print('Button Repeated: %s' % 'PowerAll')
+        ## Shutdown routine
+        if PwrCount == 4:
+            Denon.Set('Power','Off')
+            Denon_Data['Power'] = 'Off'
+            TLP.ShowPage('Index')
+    ## If the user release the Button:
+    ## Clean the counter power data in GUI and delete the visual feedback
+    elif state == 'Released':
+        PwrCount = 0
+        BtnPowerAll.SetState(0)
+        LblCountAll.SetText('')
+        print('Button Released: %s' % 'PowerAll')
     pass
 
 ## End Events Definitions-------------------------------------------------------

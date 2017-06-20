@@ -183,7 +183,7 @@ GroupSetE  = MESet(PageAudioE)
 ## Group Page BluRay
 PageBRNav  = [BtnBRUp, BtnBRLeft, BtnBRDown, BtnBRRight, BtnBREnter]
 PageBROpt  = [BtnBRPopup, BtnBRSetup, BtnBRInfo, BtnBRReturn, BtnBRTray, BtnBRPower]
-PageBRPlay = [BtnBRPrev, BtnBRBack, BtnBRPause, BtnBRPlay, BtnBRStop, BtnBRRewi, BtnBRNext]
+PageBRPlay = [BtnBRPrev, BtnBRBack, BtnBRPause, BtnBRPlay, BtnBRStop, BtnBRRewi, BtnBRNext, BtnBRTray]
 GroupPlay  = MESet(PageBRPlay)
 ## Group Button State List
 ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
@@ -194,6 +194,12 @@ def Initialize():
     ## Opening a new Connection Thread to all devices
     #Biamp.Connect()
     Denon.Initialize()
+    
+    ## Denon Subscribe Commands
+    Denon.SubscribeStatus('ConnectionStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('DiscTypeStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('PlaybackStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('Power',None,Denon_Parsing)
     
     ## TouchPanel Functions
     GroupMode.SetCurrent(None)
@@ -212,7 +218,7 @@ def Initialize():
 
 ## Data Parsing Functions - IP Controlled Devices ------------------------------
 def Biamp_Parsing(command,value,qualifier):
-    ## Real Time data: LAN Connection
+
     if command == 'ConnectionStatus':
         if value == 'Connected':
             Biamp_Data['Conex'] = 'Connected'
@@ -220,7 +226,7 @@ def Biamp_Parsing(command,value,qualifier):
         elif value == 'Disconnected':
             Biamp_Data['Conex'] = 'Disconnected'
             BtnLANBiamp.SetState(0)
-    ## Real Time data: Audio Source Selection Block´s
+
     elif command == 'SourceSelectorSourceSelection':
         if qualifier['Instance Tag'] == 'SelectorA':
             GroupSetA.SetCurrent(int(value)) ##Turn On the active Source Button
@@ -235,7 +241,7 @@ def Biamp_Parsing(command,value,qualifier):
     pass
 
 def Quantum_Parsing(command,value,qualifier):
-    ## Real Time data: LAN Connection
+
     if command == 'ConnectionStatus':
         if value == 'Connected':
             Quantum_Data['Conex'] = 'Connected'
@@ -243,21 +249,62 @@ def Quantum_Parsing(command,value,qualifier):
         elif value == 'Disconnected':
             Quantum_Data['Conex'] = 'Disconnected'
             BtnLANVWall.SetState(0)
-    ## Real Time data: Physical Device Status
+
     elif command == 'DeviceStatus':
         Quantum_Data['DeviceStatus'] = value ##Store the value in Dictionary
     
     pass
+
 ## Data Parsing Functions - Serial Controlled Devices --------------------------
 def Denon_Parsing(command,value,qualifier):
+
+    if command == 'ConnectionStatus':
+        if value == 'Connected':
+            Denon_Data['Conex'] = 'Connected'
+            Btn232Denon.SetState(1)
+        elif value == 'Disconnected':
+            Denon_Data['Conex'] = 'Disconnected'
+            Btn232Denon.SetState(0)
+    
+    elif command == 'DiscTypeStatus':
+        Denon_Data['DiscType'] = value
+        print(Denon_Data['DiscType'])
+        
+    elif command == 'PlaybackStatus':
+        Denon_Data['PlaybackStatus'] = value ##Store the value in Dictionary
+        print(Denon_Data['PlaybackStatus'])
+        if value == 'Fast Reverse':
+            GroupPlay.SetCurrent(BtnBRBack)
+        elif value == 'Playing':
+            GroupPlay.SetCurrent(BtnBRPlay)
+        elif value == 'Paused':
+            GroupPlay.SetCurrent(BtnBRPause)
+        elif value == 'Stopped' or value == 'Resume Stop':
+            GroupPlay.SetCurrent(BtnBRStop)
+        elif value == 'Fast Forward':
+            GroupPlay.SetCurrent(BtnBRRewi)
+        elif value == 'Tray Opening':
+            GroupPlay.SetCurrent(BtnBRTray)
+        else:
+            GroupPlay.SetCurrent(None)
+
+    elif command == 'Power':
+        Denon_Data['Power'] = value ##Store the value in Dictionary
+        print(Denon_Data['Power'])
+        if value == 'On':
+            Denon_Data['Power'] = 'On'
+            BtnBRPower.SetState(1)
+        elif value == 'Off':
+            Denon_Data['Power'] = 'Off'
+            BtnBRPower.SetState(0)
     pass
 ## Data dictionaries -----------------------------------------------------------
 ## Each dictionary store the real time information of room devices
 ## Data dictionaries - IP Controlled Devices -----------------------------------
 Biamp_Data = {
+    'Channel' : '',
     'Conex'   : '',
     'Router'  : '',
-    'Channel' : '',
 }
 Quantum_Data = {
     'Conex'        : '',
@@ -265,54 +312,64 @@ Quantum_Data = {
 }
 ## Data dictionaries - Serial Controlled Devices -------------------------------
 Denon_Data = {
-    'ConnectionStatus' : '',
-    'Power'            : '',
-    'PlaybackStatus'   : ''
+    'Conex'          : '',
+    'DiscType'       : '',
+    'PlaybackStatus' : '',
+    'Power'          : '',
 }
 ## Event Definitions -----------------------------------------------------------
 ## This section define all actions that a user triggers through the buttons ----
 ## Page Index ------------------------------------------------------------------
 @event(BtnIndex, 'Pressed')
 def IndexEvents(button, state):
+    TLP.HideAllPopups()
     TLP.ShowPage('Main')
+    TLP.ShowPopup('Welcome')
     print('Touch Mode: %s' % 'Index')
     pass
 
 ## Main Page -------------------------------------------------------------------
 @event(PageMain, ButtonEventList)
 def MainEvents(button, state):
-    #--
+
     if button is BtnVideo and state == 'Pressed':
         LblMaster.SetText('Proyección de Video')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('VWall')
         print('Touch Mode: %s' % 'VideoWall')
-    #--
+
     elif button is BtnAudio and state == 'Pressed':
         LblMaster.SetText('Selección de Audio')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('Audios')
         print('Touch Mode: %s' % 'Audio')
-    #--
-    elif button is BtnBluRay and state == 'Pressed':       
-        QueryDenon() #Recall a status function
+
+    elif button is BtnBluRay and state == 'Pressed':
+        ## Query for Information
+        Denon.Update('Power')
+        Denon.Update('PlaybackStatus')
+        Denon.Update('DiscTypeStatus')
+        print('-> Data Denon Powr: ' + Denon_Data['Power'])
+        print('-> Data Denon Play: ' + Denon_Data['PlaybackStatus'])
+        print('-> Data Denon Disk: ' + Denon_Data['DiscType'])
+        
         LblMaster.SetText('Control de BluRay')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('BR')
         print('Touch Mode: %s' % 'BluRay')
-    #--
+
     elif button is BtnStatus and state == 'Pressed':
         LblMaster.SetText('Información de dispositivos')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('Status')
         print('Touch Mode: %s' % 'Status')
-    #--
+
     elif button is BtnPowerOff and state == 'Pressed':
         LblMaster.SetText('Apagado del Sistema')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('x_PowerOff')
         print('Touch Mode: %s' % 'PowerOff')
-    #--
+
     ##Turn On the feedbak of last pressed button
     GroupMode.SetCurrent(button)
     pass
@@ -549,111 +606,108 @@ def AudioEEvents(button, state):
 @event(PageBRNav, ButtonEventList)
 def BRNavigationEvents(button, state):
     if button is BtnBRUp and state == 'Pressed':
-        Denon.Send(b'KYCR UP\r')
+        Denon.Set('MenuNavigation','Up')
         print("BluRay Pressed: %s" % 'Up')
+        
     elif button is BtnBRLeft and state == 'Pressed':
-        Denon.Send(b'KYCR LT\r')
+        Denon.Set('MenuNavigation','Left')
         print("BluRay Pressed: %s" % 'Left')
+    
     elif button is BtnBRDown and state == 'Pressed':
-        Denon.Send(b'KYCR DW\r')
+        Denon.Set('MenuNavigation','Down')
         print("BluRay Pressed: %s" % 'Down')
+    
     elif button is BtnBRRight and state == 'Pressed':
-        Denon.Send(b'KYCR RT\r')
+        Denon.Set('MenuNavigation','Right')
         print("BluRay Pressed: %s" % 'Right')
+    
     elif button is BtnBREnter and state == 'Pressed':
-        Denon.Send(b'KYENTER\r')
+        Denon.Set('MenuNavigation','Enter')
         print("BluRay Pressed: %s" % 'Enter')
     pass
-#--
+
 @event(PageBROpt, ButtonEventList)
 def BROptionEvents(button, state):
-    #--
+
     if button is BtnBRPopup and state == 'Pressed':
-        Denon.Send(b'KYPMENU\r')
+        Denon.Set('MenuNavigation','Menu')
         BtnBRPopup.SetState(1)
         print("BluRay Pressed: %s" % 'Menu')
     else:
         BtnBRPopup.SetState(0)
-    #--
+
     if button is BtnBRSetup and state == 'Pressed':
-        Denon.Send(b'KYSETUP\r')
+        Denon.Set('Function','Setup')
         BtnBRSetup.SetState(1)
         print("BluRay Pressed: %s" % 'Title')
     else:
         BtnBRSetup.SetState(0)
-    #--
+
     if button is BtnBRInfo and state == 'Pressed':
-        Denon.Send(b'KYDISP\r')
+        Denon.Set('Function','Display')
         BtnBRInfo.SetState(1)
         print("BluRay Pressed: %s" % 'Info')
     else:
         BtnBRInfo.SetState(0)
-    #--
+
     if button is BtnBRReturn and state == 'Pressed':
-        Denon.Send(b'KYRETURN\r')
+        Denon.Set('MenuNavigation','Return')
         BtnBRReturn.SetState(1)
         print("BluRay Pressed: %s" % 'Return')
     else:
         BtnBRReturn.SetState(0)
-    #--
+
     if button is BtnBRTray and state == 'Pressed':
-        Denon.Send(b'KYTY EJ\r')
-        BtnBRTray.SetState(1)
+        Denon.Set('Transport','Eject')
         print("BluRay Pressed: %s" % 'Tray')
-    else:
-        BtnBRTray.SetState(0)
-    #--
+
     if button is BtnBRPower and state == 'Pressed':
         print("BluRay Pressed: %s" % 'Power')
         if Denon_Data['Power'] == 'On':
-            Denon.Send(b'KYPW OF\r')
+            BtnBRPower.SetState(0)
+            Denon.Set('Power','Off')
         elif Denon_Data['Power'] == 'Off':
-            Denon.Send(b'KYPW ON\r')
-    #--
+            BtnBRPower.State(1)
+            Denon.Set('Power','On')
     pass
-#--
+
 @event(PageBRPlay, ButtonEventList)
 def BRPlayEvents(button, state):
-    #--
+
     if button is BtnBRPrev and state == 'Pressed':
-        Denon.Send(b'KYSK RV\r')
+        Denon.Set('Transport','Previous')
         BtnBRPrev.SetState(1)
         print("BluRay Pressed: %s" % 'Prev')
     else:
         BtnBRPrev.SetState(0)
-    #--
+
     if button is BtnBRBack and state == 'Pressed':
-        Denon.Send(b'KYSE RV\r')
-        GroupPlay.SetCurrent(BtnBRBack)
+        Denon.Set('Transport','Rew')
         print("BluRay Pressed: %s" % 'Back')
-    #--
+
     if button is BtnBRPause and state == 'Pressed':
-        Denon.Send(b'KYPAUS\r')
-        GroupPlay.SetCurrent(BtnBRPause)
+        Denon.Set('Transport','Pause')
         print("BluRay Pressed: %s" % 'Pause')
-    #--
+
     if button is BtnBRPlay and state == 'Pressed':
-        Denon.Send(b'KYPLAY\r')
-        GroupPlay.SetCurrent(BtnBRPlay)
+        Denon.Set('Transport','Play')
         print("BluRay Pressed: %s" % 'Play')
-    #--
+
     if button is BtnBRStop and state == 'Pressed':
-        Denon.Send(b'KYSTOP\r')
-        GroupPlay.SetCurrent(BtnBRStop)
+        Denon.Set('Transport','Stop')
         print("BluRay Pressed: %s" % 'Stop')
-    #--
+
     if button is BtnBRRewi and state == 'Pressed':
-        Denon.Send(b'KYSE FW\r')
-        GroupPlay.SetCurrent(BtnBRRewi)
+        Denon.Set('Transport','FFwd')
         print("BluRay Pressed: %s" % 'Rewind')
-    #--
+
     if button is BtnBRNext and state == 'Pressed':
-        Denon.Send(b'KYSK FW\r')
+        Denon.Set('Transport','Next')
         BtnBRNext.SetState(1)
         print("BluRay Pressed: %s" % 'Next')
     else:
         BtnBRNext.SetState(0)
-    #--
+
     pass
 
 ## Status Page -----------------------------------------------------------------

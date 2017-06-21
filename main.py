@@ -36,7 +36,7 @@ import extr_sp_Quantum_Ultra610_v1_0_1_0  as DeviceB
 import deno_dvd_DBT3313UD_Series_v1_0_2_0 as DeviceC
 ## IR/Serial-controlled Modules declared:
 ## IP-controlled Devices declared:
-Biamp   = DeviceA.EthernetClass('10.10.10.13', 23, Model='TesiraFORTE CI')
+Biamp   = DeviceA.EthernetClass('192.168.10.150', 23, Model='TesiraFORTE CI')
 Quantum = DeviceB.EthernetClass('10.10.10.12', 23, Model='Quantum Ultra 610')
 ## Serial-controlled Devices declared:
 Denon   = DeviceC.SerialClass(IPCP, 'COM1', Baud=9600, Model='DBT-3313UD')
@@ -195,13 +195,25 @@ ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
 # This is the last function that loads when starting the system-----------------
 def Initialize():
     ## Opening a new Connection Thread to all devices
-    #Biamp.Connect()
+    Biamp.Connect()
     Denon.Initialize()
     
     ## Power Page Counter Variable
     global PwrCount
     PwrCount = 0
     
+    ## Biamp Subscribe Commands
+    Biamp.SubscribeStatus('ConnectionStatus',None,Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'},Biamp_Parsing)
+
+    ## Quantum Subscribe Commands
+    Quantum.SubscribeStatus('ConnectionStatus',None,Quantum_Parsing)
+    Quantum.SubscribeStatus('DeviceStatus',None,Quantum_Parsing)
+
     ## Denon Subscribe Commands
     Denon.SubscribeStatus('ConnectionStatus',None,Denon_Parsing)
     Denon.SubscribeStatus('CurrentChapterTrackNum',None,Denon_Parsing)
@@ -215,6 +227,11 @@ def Initialize():
     TLP.HidePopupGroup(2)
     TLP.ShowPage('Index')
     TLP.ShowPopup('Welcome')
+    
+    ## Update Data Dictionaries
+    @Wait(5)
+    def CheckData():
+        DictionaryUpdate()
     
     ## Notify to Console
     print("System Initialize")
@@ -237,16 +254,44 @@ def Biamp_Parsing(command,value,qualifier):
             BtnLANBiamp.SetState(0)
 
     elif command == 'SourceSelectorSourceSelection':
-        if qualifier['Instance Tag'] == 'SelectorA':
-            GroupSetA.SetCurrent(int(value)) ##Turn On the active Source Button
-        elif qualifier['Instance Tag'] == 'SelectorB':
-            GroupSetB.SetCurrent(int(value)) ##Turn On the active Source Button
-        elif qualifier['Instance Tag'] == 'SelectorC':
-            GroupSetC.SetCurrent(int(value)) ##Turn On the active Source Button
-        elif qualifier['Instance Tag'] == 'SelectorD':
-            GroupSetD.SetCurrent(int(value)) ##Turn On the active Source Button
-        elif qualifier['Instance Tag'] == 'SelectorE':
-            GroupSetE.SetCurrent(int(value)) ##Turn On the active Source Button
+        print(qualifier)
+        print(value)
+        ## The value is the active channel of active Source Selector Block
+        if value == 'No Source':
+            if qualifier['Instance Tag'] == 'SelectorA':
+                Biamp_Data['SelectorA'] = 'No Source' ##Store data in Dictionary
+                GroupSetA.SetCurrent(None) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorB':
+                Biamp_Data['SelectorB'] = 'No Source' ##Store data in Dictionary
+                GroupSetB.SetCurrent(None) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorC':
+                Biamp_Data['SelectorC'] = 'No Source' ##Store data in Dictionary
+                GroupSetC.SetCurrent(None) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorD':
+                Biamp_Data['SelectorD'] = 'No Source' ##Store data in Dictionary
+                GroupSetD.SetCurrent(None) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorE':
+                Biamp_Data['SelectorE'] = 'No Source' ##Store data in Dictionary
+                GroupSetE.SetCurrent(None) ##Turn On-Off the active Source Button
+        else:
+            value = int(value) ##The active channel is string type, now is integer
+            value = value - 1  ##The first index of button list is 0 not 1
+            ## Assign the value to Button Lists
+            if qualifier['Instance Tag'] == 'SelectorA':
+                Biamp_Data['SelectorA'] = (value + 1) ##Store int data in Dictionary
+                GroupSetA.SetCurrent(value) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorB':
+                Biamp_Data['SelectorB'] = (value + 1) ##Store int  data in Dictionary
+                GroupSetB.SetCurrent(value) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorC':
+                Biamp_Data['SelectorC'] = (value + 1) ##Store int  data in Dictionary
+                GroupSetC.SetCurrent(value) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorD':
+                Biamp_Data['SelectorD'] = (value + 1) ##Store int data in Dictionary
+                GroupSetD.SetCurrent(value) ##Turn On-Off the active Source Button
+            elif qualifier['Instance Tag'] == 'SelectorE':
+                Biamp_Data['SelectorE'] = (value + 1) ##Store int data in Dictionary
+                GroupSetE.SetCurrent(value) ##Turn On-Off the active Source Button
     pass
 
 def Quantum_Parsing(command,value,qualifier):
@@ -326,9 +371,12 @@ def Denon_Parsing(command,value,qualifier):
 ## Each dictionary store the real time information of room devices
 ## Data dictionaries - IP Controlled Devices -----------------------------------
 Biamp_Data = {
-    'Channel' : '',
-    'Conex'   : '',
-    'Router'  : '',
+    'Conex'     : '',
+    'SelectorA' : '',
+    'SelectorB' : '',
+    'SelectorC' : '',
+    'SelectorD' : '',
+    'SelectorE' : '',    
 }
 Quantum_Data = {
     'Conex'        : '',
@@ -343,6 +391,29 @@ Denon_Data = {
     'Power'          : '',
     'Title'          : '',
 }
+
+## Recursive functions ---------------------------------------------------------
+def DictionaryUpdate():
+    ##If any data dicionary are empty
+    if Biamp_Data['SelectorA'] == '' or Biamp_Data['SelectorB'] == '' or \
+       Biamp_Data['SelectorC'] == '' or Biamp_Data['SelectorD'] == ''or \
+       Biamp_Data['SelectorE'] == '':
+       ## Send Queries information to devices
+       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'})
+       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'})
+       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'})
+       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'})
+       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'})
+       ## Notify to Console
+       print('-> Data Biamp SourceA: ' + str(Biamp_Data['SelectorA']))
+       print('-> Data Biamp SourceB: ' + str(Biamp_Data['SelectorB']))
+       print('-> Data Biamp SourceC: ' + str(Biamp_Data['SelectorC']))
+       print('-> Data Biamp SourceD: ' + str(Biamp_Data['SelectorD']))
+       print('-> Data Biamp SourceE: ' + str(Biamp_Data['SelectorE']))
+    pass
+       
+    
+
 ## Event Definitions -----------------------------------------------------------
 ## This section define all actions that a user triggers through the buttons ----
 ## Page Index ------------------------------------------------------------------
@@ -371,19 +442,6 @@ def MainEvents(button, state):
         print('Touch Mode: %s' % 'Audio')
 
     elif button is BtnBluRay and state == 'Pressed':
-        ## Query for Information
-        Denon.Update('CurrentChapterTrackNum')
-        Denon.Update('CurrentTitleAlbumNum')
-        Denon.Update('DiscTypeStatus')
-        Denon.Update('PlaybackStatus')
-        Denon.Update('Power')
-        ## Notify to Console
-        print('-> Data Denon Chap: ' + str(Denon_Data['Chapter']))
-        print('-> Data Denon Titl: ' + str(Denon_Data['Title']))
-        print('-> Data Denon Disk: ' + Denon_Data['DiscType'])
-        print('-> Data Denon Play: ' + Denon_Data['PlaybackStatus'])
-        print('-> Data Denon Powr: ' + Denon_Data['Power'])
-        
         LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
         LblMaster.SetText('Control de BluRay')
         TLP.HidePopupGroup(2)

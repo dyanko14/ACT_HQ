@@ -152,7 +152,6 @@ BtnBRReturn = Button(TLP, 146)
 BtnBRTray   = Button(TLP, 148)
 BtnBRPower  = Button(TLP, 150)
 LblBRDisk   = Label(TLP, 151)
-
 ## Page Status
 BtnLANBiamp = Button(TLP, 201)
 BtnLANVWall = Button(TLP, 202)
@@ -227,12 +226,7 @@ def Initialize():
     TLP.HidePopupGroup(2)
     TLP.ShowPage('Index')
     TLP.ShowPopup('Welcome')
-    
-    ## Update Data Dictionaries
-    @Wait(5)
-    def CheckData():
-        DictionaryUpdate()
-    
+   
     ## Notify to Console
     print("System Initialize")
     pass
@@ -246,10 +240,11 @@ def Initialize():
 def Biamp_Parsing(command,value,qualifier):
 
     if command == 'ConnectionStatus':
+        print('Biamp Module connection status {}'.format(value))
         if value == 'Connected':
             Biamp_Data['Conex'] = 'Connected'
             BtnLANBiamp.SetState(1)
-        elif value == 'Disconnected':
+        else:
             Biamp_Data['Conex'] = 'Disconnected'
             BtnLANBiamp.SetState(0)
 
@@ -325,23 +320,19 @@ def Denon_Parsing(command,value,qualifier):
         Denon_Data['Chapter'] = value ##Store the value in Dictionary
         ## Send the new data to GUI BluRay Label
         LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
-        print('Parsing Denon Chapter: ' + str(Denon_Data['Chapter']))
 
     elif command == 'CurrentTitleAlbumNum':
         Denon_Data['Title'] = value ##Store the value in Dictionary
         ## Send the new data to GUI BluRay Label
         LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
-        print('Parsing Denon Title:' + str(Denon_Data['Title']))
 
     elif command == 'DiscTypeStatus':
         Denon_Data['DiscType'] = value ##Store the value in Dictionary
         ## Send the new data to GUI BluRay Label
         LblBRDisk.SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
-        print('Parsing Denon Disk:' + Denon_Data['DiscType'])
  
     elif command == 'PlaybackStatus':
         Denon_Data['PlaybackStatus'] = value ##Store the value in Dictionary
-        print('Parsing Denon Play:' + Denon_Data['PlaybackStatus'])
         if value == 'Fast Reverse':
             GroupPlay.SetCurrent(BtnBRBack)
         elif value == 'Playing':
@@ -359,7 +350,6 @@ def Denon_Parsing(command,value,qualifier):
 
     elif command == 'Power':
         Denon_Data['Power'] = value ##Store the value in Dictionary
-        print('Parsing Denon Power:' + Denon_Data['Power'])
         if value == 'On':
             Denon_Data['Power'] = 'On'
             BtnBRPower.SetState(1)
@@ -393,26 +383,28 @@ Denon_Data = {
 }
 
 ## Recursive functions ---------------------------------------------------------
-def DictionaryUpdate():
-    ##If any data dicionary are empty
-    if Biamp_Data['SelectorA'] == '' or Biamp_Data['SelectorB'] == '' or \
-       Biamp_Data['SelectorC'] == '' or Biamp_Data['SelectorD'] == ''or \
-       Biamp_Data['SelectorE'] == '':
-       ## Send Queries information to devices
-       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'})
-       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'})
-       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'})
-       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'})
-       Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'})
-       ## Notify to Console
-       print('-> Data Biamp SourceA: ' + str(Biamp_Data['SelectorA']))
-       print('-> Data Biamp SourceB: ' + str(Biamp_Data['SelectorB']))
-       print('-> Data Biamp SourceC: ' + str(Biamp_Data['SelectorC']))
-       print('-> Data Biamp SourceD: ' + str(Biamp_Data['SelectorD']))
-       print('-> Data Biamp SourceE: ' + str(Biamp_Data['SelectorE']))
-    pass
-       
-    
+def BiampAutoReconnect():
+    Biamp.Connect()
+    Reconnecttime.Restart()
+Reconnecttime = Wait(60,BiampAutoReconnect) #60s
+
+@event(Biamp, 'Connected')
+@event(Biamp, 'Disconnected')
+def BiampConnectionHandler(interface, state):
+    if state == 'Connected':
+        print('Biamp', state)
+        BtnLANBiamp.SetState(1)
+        interface.StartKeepAlive(5, (b'DEVICE get hostname\r'))
+    elif state == 'Disconnected':
+        ##TurnOff al Group Buttons
+        GroupSetA.SetCurrent(None)
+        GroupSetB.SetCurrent(None)
+        GroupSetC.SetCurrent(None)
+        GroupSetD.SetCurrent(None)
+        GroupSetE.SetCurrent(None)
+        print('Biamp', state)
+        BtnLANBiamp.SetState(0)
+        interface.StopKeepAlive()
 
 ## Event Definitions -----------------------------------------------------------
 ## This section define all actions that a user triggers through the buttons ----
@@ -436,6 +428,19 @@ def MainEvents(button, state):
         print('Touch Mode: %s' % 'VideoWall')
 
     elif button is BtnAudio and state == 'Pressed':
+        ## Send Queries information to devices
+        Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'})
+        Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'})
+        Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'})
+        Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'})
+        Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'})
+        ## Notify to Console
+        print('-> Data Biamp SourceA: ' + str(Biamp_Data['SelectorA']))
+        print('-> Data Biamp SourceB: ' + str(Biamp_Data['SelectorB']))
+        print('-> Data Biamp SourceC: ' + str(Biamp_Data['SelectorC']))
+        print('-> Data Biamp SourceD: ' + str(Biamp_Data['SelectorD']))
+        print('-> Data Biamp SourceE: ' + str(Biamp_Data['SelectorE']))
+        
         LblMaster.SetText('Selección de Audio')
         TLP.HidePopupGroup(2)
         TLP.ShowPopup('Audios')

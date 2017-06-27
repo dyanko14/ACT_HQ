@@ -5,7 +5,7 @@
 ## Project    | VideoWall Room
 ## Version    | 0.1 --------------------------------------------------------- ##
 
-## Begin ControlScript Import --------------------------------------------------
+## CONTROL SCRIPT IMPORT -------------------------------------------------------
 from extronlib import event, Version
 from extronlib.device import eBUSDevice, ProcessorDevice, UIDevice
 from extronlib.interface import (ContactInterface, DigitalIOInterface,
@@ -16,33 +16,27 @@ from extronlib.ui import Button, Knob, Label, Level
 from extronlib.system import Clock, MESet, Wait
 
 print(Version())
-from gui import TLP, Btn, Btn_Page, Btn_Group, Lbl
-## End ControlScript Import ----------------------------------------------------
-##
-## Begin Device/Processor Definition -------------------------------------------
-IPCP = ProcessorDevice('IPlink')
-## End Device/Processor Definition ---------------------------------------------
+from gui import TLP, Btn, Btn_Page, Btn_Group, Btn_State, Lbl
 
-## Begin User Import -----------------------------------------------------------
-## Instances of Python Extron modules------------------
+
+## PROCESOR DEFINITION ---------------------------------------------------------
+IPCP = ProcessorDevice('IPlink')
+
+## MODULE IMPORT ---------------------------------------------------------------
 ## Ethernet:
 import biam_dsp_TesiraSeries_v1_5_19_0    as DeviceA
 import extr_sp_Quantum_Ultra610_v1_0_1_0  as DeviceB
 ## RS-232
 import deno_dvd_DBT3313UD_Series_v1_0_2_0 as DeviceC
-## IR/Serial-controlled Modules declared:
+
 ## Ethernet:
 Biamp   = DeviceA.EthernetClass('192.168.10.150', 23, Model='TesiraFORTE CI')
 Quantum = DeviceB.EthernetClass('10.10.10.12', 23, Model='Quantum Ultra 610')
 ## RS-232:
 Denon   = DeviceC.SerialClass(IPCP, 'COM1', Baud=9600, Model='DBT-3313UD')
-## End User Import -------------------------------------------------------------
-## Begin Communication Interface Definition ------------------------------------
-## Group Button State List
-ButtonEventList = ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
-## End Communication Interface Definition --------------------------------------
 
-# This is the last function that loads when starting the system-----------------
+## INITIALIZATE ----------------------------------------------------------------
+## This is the last function that loads when starting the system
 def Initialize():
     ## Opening a new Connection Thread to all devices
     Biamp.Connect()
@@ -51,6 +45,24 @@ def Initialize():
     ## Power Page Counter Variable
     global PwrCount
     PwrCount = 4
+    
+    ## Subscribe Functions
+    Biamp.SubscribeStatus('ConnectionStatus',None,Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'},Biamp_Parsing)
+    
+    ## Update Functions
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'})
+    
+    ## ReadStatus Functions
+    checkCurrentStatus.Restart()
     
     ## TouchPanel Functions
     Btn_Group['Mode'].SetCurrent(None)
@@ -62,6 +74,183 @@ def Initialize():
     print("System Initialize")
     pass
 
+def ReadModuleStatus():
+    print(Biamp.ReadStatus('ConnectionStatus',None))
+    print(Biamp.ReadStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'}))
+    print(Biamp.ReadStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'}))
+    print(Biamp.ReadStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'}))
+    print(Biamp.ReadStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'}))
+    print(Biamp.ReadStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'}))
+    checkCurrentStatus.Restart()
+checkCurrentStatus = Wait(5, ReadModuleStatus)
+
+## DATA PARSING FUNCTIONS ------------------------------------------------------
+## These functions receive the data of the devices in real time
+## Each function stores the parsed data in dictionaries and activate feedback
+## Each function works with the subscription methods of the Python modules
+def Biamp_Parsing(command,value,qualifier):
+    ##
+    if command == 'ConnectionStatus':
+        print('Biamp Module connection status {}'.format(value))
+        if value == 'Connected':
+            Biamp_Data['Conex'] = 'Connected'
+            Btn['LANBiamp'].SetState(1)
+        else:
+            Biamp_Data['Conex'] = 'Disconnected'
+            Btn['LANBiamp'].SetState(0)
+    ##
+    elif command == 'SourceSelectorSourceSelection':
+        print(str(qualifier) + ' ' + str(value))
+        ## The value is the active channel of active Source Selector Block
+        if value == 'No Source':
+            ##
+            if qualifier['Instance Tag'] == 'SelectorA':
+                Biamp_Data['SelectorA'] = 'No Source'
+                Btn_Group['SetA'].SetCurrent(None)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorB':
+                Biamp_Data['SelectorB'] = 'No Source'
+                Btn_Group['SetB'].SetCurrent(None)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorC':
+                Biamp_Data['SelectorC'] = 'No Source'
+                Btn_Group['SetC'].SetCurrent(None)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorD':
+                Biamp_Data['SelectorD'] = 'No Source'
+                Btn_Group['SetD'].SetCurrent(None)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorE':
+                Biamp_Data['SelectorE'] = 'No Source'
+                Btn_Group['SetE'].SetCurrent(None)
+        else:
+            value = int(value) ##The active channel is string type, now is integer
+            value = value - 1  ##The first index of button list is 0 not 1
+            ## Assign the value to Button Lists
+            if qualifier['Instance Tag'] == 'SelectorA':
+                Biamp_Data['SelectorA'] = (value + 1)
+                Btn_Group['SetA'].SetCurrent(value)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorB':
+                Biamp_Data['SelectorB'] = (value + 1)
+                Btn_Group['SetB'].SetCurrent(value)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorC':
+                Biamp_Data['SelectorC'] = (value + 1)
+                Btn_Group['SetC'].SetCurrent(value)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorD':
+                Biamp_Data['SelectorD'] = (value + 1)
+                Btn_Group['SetD'].SetCurrent(value)
+            ##
+            elif qualifier['Instance Tag'] == 'SelectorE':
+                Biamp_Data['SelectorE'] = (value + 1)
+                Btn_Group['SetE'].SetCurrent(value)
+    pass
+
+def Quantum_Parsing(command,value,qualifier):
+    ##
+    if command == 'ConnectionStatus':
+        ##
+        if value == 'Connected':
+            Quantum_Data['Conex'] = 'Connected' ##Store in Dictionary
+            Btn['LANVWall'].SetState(1)
+        ##
+        elif value == 'Disconnected':
+            Quantum_Data['Conex'] = 'Disconnected' ##Store in Dictionary
+            Btn['LANVWall'].SetState(0)
+    ##
+    elif command == 'DeviceStatus':
+        Quantum_Data['DeviceStatus'] = value ##Store in Dictionary
+        print('Parsing Quantum Device: ' + Quantum_Data['DeviceStatus'])
+    pass
+
+def Denon_Parsing(command,value,qualifier):
+    ##
+    if command == 'ConnectionStatus':
+        ##
+        if value == 'Connected':
+            Denon_Data['Conex'] = 'Connected' ##Store in Dictionary
+            Btn['232Denon'].SetState(1)
+        ##
+        elif value == 'Disconnected':
+            Denon_Data['Conex'] = 'Disconnected' ##Store in Dictionary
+            Btn['232Denon'].SetState(0)
+    ##
+    elif command == 'CurrentChapterTrackNum':
+        Denon_Data['Chapter'] = value ##Store in Dictionary
+        Lbl['Bluray'].SetText(Denon_Data['DiscType'] +' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
+    ##
+    elif command == 'CurrentTitleAlbumNum':
+        Denon_Data['Title'] = value ##Store in Dictionary
+        Lbl['Bluray'].SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
+    ##
+    elif command == 'DiscTypeStatus':
+        Denon_Data['DiscType'] = value ##Store in Dictionary
+        Lbl['Bluray'].SetText(Denon_Data['DiscType'] + ' Title: ' + str(Denon_Data['Title']) + ' Chap: ' + str(Denon_Data['Chapter']))
+    ##
+    elif command == 'PlaybackStatus':
+        Denon_Data['PlaybackStatus'] = value ##Store in Dictionary
+        ##
+        if value == 'Fast Reverse':
+            Btn_Group['BR'].SetCurrent(Btn['BRBack'])
+        ##
+        elif value == 'Playing':
+            Btn_Group['BR'].SetCurrent(Btn['BRPlay'])
+        ##
+        elif value == 'Paused':
+            Btn_Group['BR'].SetCurrent(Btn['BRPause'])
+        ##
+        elif value == 'Stopped' or value == 'Resume Stop':
+            Btn_Group['BR'].SetCurrent(Btn['BRStop'])
+        ##
+        elif value == 'Fast Forward':
+            Btn_Group['BR'].SetCurrent(Btn['BRRewi'])
+        ##
+        elif value == 'Tray Opening':
+            Btn_Group['BR'].SetCurrent(Btn['BRTray'])
+        ##
+        else:
+            Btn_Group['BR'].SetCurrent(None)
+    ##
+    elif command == 'Power':
+        Denon_Data['Power'] = value ##Store in Dictionary
+        ##
+        if value == 'On':
+            Denon_Data['Power'] = 'On'
+            Btn['BRPower'].SetState(1)
+        ##
+        elif value == 'Off':
+            Denon_Data['Power'] = 'Off'
+            Btn['BRPower'].SetState(0)
+    pass
+
+## DATA DICTIONARIES -----------------------------------------------------------
+## Each dictionary store the real time information of room devices
+## Data dictionaries - IP Devices
+Biamp_Data = {
+    'Conex'     : None,
+    'SelectorA' : '',
+    'SelectorB' : '',
+    'SelectorC' : '',
+    'SelectorD' : '',
+    'SelectorE' : '',    
+}
+Quantum_Data = {
+    'Conex'        : None,
+    'DeviceStatus' : '',
+}
+## Data dictionaries - RS232 Devices
+Denon_Data = {
+    'Conex'          : None,
+    'Chapter'        : '',
+    'DiscType'       : '',
+    'PlaybackStatus' : '',
+    'Power'          : '',
+    'Title'          : '',
+}
+
+## PAGE USER EVENTS ------------------------------------------------------------
 ## Page Index ------------------------------------------------------------------
 @event(Btn['Index'], 'Pressed')
 def IndexEvents(button, state):
@@ -72,7 +261,7 @@ def IndexEvents(button, state):
     pass
 
 ## Main Page -------------------------------------------------------------------
-@event(Btn_Page['Main'], ButtonEventList)
+@event(Btn_Page['Main'], Btn_State['List'])
 def MainEvents(button, state):
 
     if button is Btn['Video'] and state == 'Pressed':
@@ -110,7 +299,7 @@ def MainEvents(button, state):
     pass
 
 ## Video Page ------------------------------------------------------------------
-@event(Btn_Page['VW'], ButtonEventList)
+@event(Btn_Page['VW'], Btn_State['List'])
 def VideoSourcesEvents(button, state):
     
     if button is Btn['VHDMI'] and state == 'Pressed':
@@ -146,7 +335,7 @@ def VideoSourcesEvents(button, state):
         print("Videowall Full: %s" % 'Share')
     pass
 
-@event(Btn_Page['VWP'], ButtonEventList)
+@event(Btn_Page['VWP'], Btn_State['List'])
 def VideoPresetsEvents(button, state):
     
     if button is Btn['VP1'] and state == 'Pressed':
@@ -182,7 +371,7 @@ def VideoPresetsEvents(button, state):
         print("Videowall Preset: %s" % '8')
     pass
 
-@event(Btn_Page['VWPw'], ButtonEventList)
+@event(Btn_Page['VWPw'], Btn_State['List'])
 def VideoPwrEvents(button, state):
     
     if button is Btn['VWPwr1'] and state == 'Pressed':
@@ -193,7 +382,7 @@ def VideoPwrEvents(button, state):
     pass
 
 ## Audio Page ------------------------------------------------------------------
-@event(Btn_Page['Set'], ButtonEventList)
+@event(Btn_Page['Set'], Btn_State['List'])
 def AudioSetEvents(button, state):
     
     if button is Btn['SetA'] and state == 'Pressed':
@@ -220,7 +409,7 @@ def AudioSetEvents(button, state):
     Btn_Group['Set'].SetCurrent(button)
     pass
 
-@event(Btn_Page['SetA'], ButtonEventList)
+@event(Btn_Page['SetA'], Btn_State['List'])
 def AudioAEvents(button, state):
     
     if button is Btn['A_HDMI'] and state == 'Pressed':
@@ -256,7 +445,7 @@ def AudioAEvents(button, state):
         print("Audio on Set %s: %s" % ('A','Share'))
     pass
 
-@event(Btn_Page['SetB'], ButtonEventList)
+@event(Btn_Page['SetB'], Btn_State['List'])
 def AudioBEvents(button, state):
     
     if button is Btn['B_HDMI'] and state == 'Pressed':
@@ -292,7 +481,7 @@ def AudioBEvents(button, state):
         print("Audio on Set %s: %s" % ('B','Share'))
     pass
     
-@event(Btn_Page['SetC'], ButtonEventList)
+@event(Btn_Page['SetC'], Btn_State['List'])
 def AudioCEvents(button, state):
     
     if button is Btn['C_HDMI'] and state == 'Pressed':
@@ -328,7 +517,7 @@ def AudioCEvents(button, state):
         print("Audio on Set %s: %s" % ('C','Share'))
     pass
 
-@event(Btn_Page['SetD'], ButtonEventList)
+@event(Btn_Page['SetD'], Btn_State['List'])
 def AudioDEvents(button, state):
     
     if button is Btn['D_HDMI'] and state == 'Pressed':
@@ -364,7 +553,7 @@ def AudioDEvents(button, state):
         print("Audio on Set %s: %s" % ('D','Share'))
     pass
 
-@event(Btn_Page['SetE'], ButtonEventList)
+@event(Btn_Page['SetE'], Btn_State['List'])
 def AudioEEvents(button, state):
     
     if button is Btn['E_HDMI'] and state == 'Pressed':
@@ -401,7 +590,7 @@ def AudioEEvents(button, state):
     pass
 
 ## Bluray Page -----------------------------------------------------------------
-@event(Btn_Page['BRN'], ButtonEventList)
+@event(Btn_Page['BRN'], Btn_State['List'])
 def BRNavigationEvents(button, state):
     
     if button is Btn['BRUp'] and state == 'Pressed':
@@ -425,7 +614,7 @@ def BRNavigationEvents(button, state):
         print("BluRay Pressed: %s" % 'Enter')
     pass
 
-@event(Btn_Page['BRO'], ButtonEventList)
+@event(Btn_Page['BRO'], Btn_State['List'])
 def BROptionEvents(button, state):
 
     if button is Btn['BRPopup'] and state == 'Pressed':
@@ -468,7 +657,7 @@ def BROptionEvents(button, state):
             Denon.Set('Power','On')
     pass
     
-@event(Btn_Page['BRP'], ButtonEventList)
+@event(Btn_Page['BRP'], Btn_State['List'])
 def BRPlayEvents(button, state):
 
     if button is Btn['BRPrev'] and state == 'Pressed':
@@ -510,7 +699,7 @@ def BRPlayEvents(button, state):
 ## Status Page -----------------------------------------------------------------
 
 ## Power Page ------------------------------------------------------------------
-@event(Btn['PowerAll'], ButtonEventList)
+@event(Btn['PowerAll'], Btn_State['List'])
 def PowerEvents(button, state):   
     global PwrCount
     ## If the user press the Power Button:

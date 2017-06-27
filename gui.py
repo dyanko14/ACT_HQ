@@ -5,6 +5,7 @@
 ## Project    | VideoWall Room
 ## Version    | 0.1 --------------------------------------------------------- ##
 
+## CONTROL SCRIPT IMPORT -------------------------------------------------------
 from extronlib.device import UIDevice
 from extronlib.ui import Button, Label, Level
 from extronlib.system import MESet
@@ -164,10 +165,26 @@ Btn_Page = {
 
 # UI Group Page Buttons
 Btn_Group = {
-    'Mode': MESet([Btn['Video'],Btn['Audio'],Btn['Bluray'],Btn['Status'],Btn['Power']]),
+    'Mode': MESet(Btn_Page['Main']),
     ##
-    'Set' : MESet([Btn['SetA'],Btn['SetB'],Btn['SetC'],Btn['SetD'],Btn['SetE']]),
+    'Set' : MESet(Btn_Page['Set']),
     ##
+    'SetA': MESet(Btn_Page['SetA']),
+    ##
+    'SetB': MESet(Btn_Page['SetB']),
+    ##
+    'SetC': MESet(Btn_Page['SetC']),
+    ##
+    'SetD': MESet(Btn_Page['SetD']),
+    ##
+    'SetE': MESet(Btn_Page['SetE']),
+    ##
+    'BR'  : MESet(Btn_Page['BRP']),
+}
+
+# UI Button states
+Btn_State = {
+    'List' : ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped'],
 }
 
 # UI Labels

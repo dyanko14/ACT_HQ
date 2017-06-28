@@ -128,37 +128,37 @@ Btn = {
 # UI Page Buttons
 Btn_Page = {
     'Main': [Btn['Video'],Btn['Audio'],Btn['Bluray'],Btn['Status'],Btn['Power']],
-    ##
+    
     'VW'  : [Btn['VHDMI'],Btn['VPS4'],Btn['VXbox'],Btn['VBluray'],
              Btn['VSky'],Btn['VRoku'],Btn['VPC'],Btn['VShare']],
-    ##
+    
     'VWP' : [Btn['VP1'],Btn['VP2'],Btn['VP3'],Btn['VP4'],
              Btn['VP5'],Btn['VP6'],Btn['VP7'],Btn['VP8']],
-    ##
+    
     'VWPw': [Btn['VWPwr1'],Btn['VWPwr0']],
-    ##
+    
     'Set' : [Btn['SetA'],Btn['SetB'],Btn['SetC'],Btn['SetD'],Btn['SetE']],
-    ##
+    
     'SetA': [Btn['A_HDMI'],Btn['A_PS4'],Btn['A_Xbox'],Btn['A_Bluray'],
              Btn['A_Sky'],Btn['A_Roku'],Btn['A_PC'],Btn['A_Share']],
-    ##
+    
     'SetB': [Btn['B_HDMI'],Btn['B_PS4'],Btn['B_Xbox'],Btn['B_Bluray'],
              Btn['B_Sky'],Btn['B_Roku'],Btn['B_PC'],Btn['B_Share']],
-    ##
+    
     'SetC': [Btn['C_HDMI'],Btn['C_PS4'],Btn['C_Xbox'],Btn['C_Bluray'],
              Btn['C_Sky'],Btn['C_Roku'],Btn['C_PC'],Btn['C_Share']],
-    ##
+    
     'SetD': [Btn['D_HDMI'],Btn['D_PS4'],Btn['D_Xbox'],Btn['D_Bluray'],
              Btn['D_Sky'],Btn['D_Roku'],Btn['D_PC'],Btn['D_Share']],
-    ##
+    
     'SetE': [Btn['E_HDMI'],Btn['E_PS4'],Btn['E_Xbox'],Btn['E_Bluray'],
              Btn['E_Sky'],Btn['E_Roku'],Btn['E_PC'],Btn['E_Share']],
-    ##
+    
     'BRN' : [Btn['BRUp'],Btn['BRLeft'],Btn['BRDown'],Btn['BRRight'],Btn['BREnter']],
-    ##
+    
     'BRO' : [Btn['BRPopup'],Btn['BRSetup'],Btn['BRInfo'],Btn['BRReturn'],
              Btn['BRTray'],Btn['BRPower']],
-    ##
+    
     'BRP' : [Btn['BRPrev'],Btn['BRBack'],Btn['BRPause'],Btn['BRPlay'],
              Btn['BRStop'],Btn['BRRewi'],Btn['BRNext']],
 }
@@ -166,19 +166,19 @@ Btn_Page = {
 # UI Group Page Buttons
 Btn_Group = {
     'Mode': MESet(Btn_Page['Main']),
-    ##
+    
     'Set' : MESet(Btn_Page['Set']),
-    ##
+    
     'SetA': MESet(Btn_Page['SetA']),
-    ##
+    
     'SetB': MESet(Btn_Page['SetB']),
-    ##
+    
     'SetC': MESet(Btn_Page['SetC']),
-    ##
+    
     'SetD': MESet(Btn_Page['SetD']),
-    ##
+    
     'SetE': MESet(Btn_Page['SetE']),
-    ##
+    
     'BR'  : MESet(Btn_Page['BRP']),
 }
 
@@ -190,15 +190,36 @@ Btn_State = {
 # UI Labels
 Lbl = {
     'Master': Label(TLP, 300),
-    ## Audio
+     ## Audio
     'SetA'  : Label(TLP, 51),
     'SetB'  : Label(TLP, 52),
     'SetC'  : Label(TLP, 53),
     'SetD'  : Label(TLP, 54),
     'SetE'  : Label(TLP, 55),
-    ## BluRay
+     ## BluRay
     'Bluray': Label(TLP, 151),
-    ## Power
+     ## Power
     'AllOff'   : Label(TLP, 221),
     'CountAll' : Label(TLP, 222),
+}
+
+Popup = {
+    'Index'  : 'Index',
+    'Main'   : 'Main',
+    'Video'  : 'VWall',
+    'Audio'  : 'Audios',
+    'AudioA' : 'Audio_Sources_A',
+    'AudioB' : 'Audio_Sources_B',
+    'AudioC' : 'Audio_Sources_C',
+    'AudioD' : 'Audio_Sources_D',
+    'AudioE' : 'Audio_Sources_E',
+    'Bluray' : 'BR',
+    'Status' : 'Status',
+    'Hi'     : 'Welcome',
+    'Power'  : 'x_PowerOff',
+}
+
+Page = {
+    'Index'  : 'Index',
+    'Main'   : 'Main',
 }

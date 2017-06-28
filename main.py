@@ -39,6 +39,7 @@ Denon   = DeviceC.SerialClass(IPCP, 'COM1', Baud=9600, Model='DBT-3313UD')
 def Initialize():
     ## Opening a new Connection Thread to all devices
     Biamp.Connect()
+    Quantum.Connect()
     Denon.Initialize()
     
     ## Power Page Counter Variable
@@ -226,11 +227,12 @@ def DenonLabel():
     pass
 
 ## RECURSIVE FUNCTIONS -----------------------------------------------------------
+## This functions report a 'Online' / 'Offline' status after to send the Connect() Method
+## CAUTION: If you never make a Connect(), the Extron Module never will work with Subscriptions
+
 @event(Biamp, 'Connected')
 @event(Biamp, 'Disconnected')
 def BiampConnectionHandler(interface, state):
-## This function report a 'Online' / 'Offline' status after to send the Connect() Method
-## CAUTION: If you never make a Connect(), the Extron Module never will work with Subscriptions
     print('Biamp Conex Event: ' + state)
     if state == 'Connected':
         Btn['LANBiamp'].SetState(1)
@@ -241,9 +243,22 @@ def BiampConnectionHandler(interface, state):
         Trying()
     pass
 
+@event(Quantum, 'Connected')
+@event(Quantum, 'Disconnected')
+def QuantumConnectionHandler(interface, state):
+    print('Quantum Conex Event: ' + state)
+    if state == 'Connected':
+        Btn['LANVWall'].SetState(1)
+        Quantum_Data['ConexEvent'] = True
+    if state == 'Disconnected':
+        Btn['LANVWall'].SetState(0)
+        Quantum_Data['ConexEvent'] = False
+        Trying2()
+    pass
+
+## This functions try to make a Connect() 
+## Help´s when the device was Off in the first Connect() method when the code starts
 def Trying():
-## This function try to make a Connect() 
-## This help when the device was Off in the first Connect() method when the code starts
     if Biamp_Data['ConexEvent'] == False:
         print('Tryng to make a Connect() in Biamp')
         Biamp.Connect()
@@ -251,12 +266,21 @@ def Trying():
     pass
 LoopTrying = Wait(5, Trying) ## Invoke a validate function every 5s
 
+def Trying2():
+    if Quantum_Data['ConexEvent'] == False:
+        print('Tryng to make a Connect() in Quantum')
+        Quantum.Connect()
+        LoopTrying2.Restart()
+    pass
+LoopTrying2 = Wait(5, Trying2) ## Invoke a validate function every 5s
+
 def UpdateLoop():
     # This not affect any device
     # This return True / False when no response is received from Module
     # If in 5 times the data is not reported (connectionCounter = 5) from the Update Command
     # Generate 'Connected' / 'Disconnected'
     Biamp.Update('VerboseMode')
+    Quantum.Update('Input',{'Window':1,'Canvas':'1'})
     Denon.Update('PlaybackStatus')
     loopUpdate.Restart()
 loopUpdate = Wait(12, UpdateLoop) # Invoke a query function each 12s

@@ -37,40 +37,18 @@ Denon   = DeviceC.SerialClass(IPCP, 'COM1', Baud=9600, Model='DBT-3313UD')
 ## INITIALIZATE ----------------------------------------------------------------
 ## This is the last function that loads when starting the system
 def Initialize():
-    ## Opening a new Connection Thread to all devices
+    ## Opening a new connection Socket
+    ## IP Sockets
     Biamp.Connect()
     Quantum.Connect()
+    ## Serial Sockets
     Denon.Initialize()
-    
+    SubscribeDenon()
+    UpdateDenon()
+
     ## Power Page Counter Variable
     global intPwrCount
     intPwrCount = 4
-    
-    ## Subscribe Functions
-    Biamp.SubscribeStatus('ConnectionStatus',None,Biamp_Parsing)
-    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'},Biamp_Parsing)
-    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'},Biamp_Parsing)
-    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'},Biamp_Parsing)
-    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'},Biamp_Parsing)
-    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'},Biamp_Parsing)
-    Denon.SubscribeStatus('ConnectionStatus',None,Denon_Parsing)
-    Denon.SubscribeStatus('CurrentChapterTrackNum',None,Denon_Parsing)
-    Denon.SubscribeStatus('CurrentTitleAlbumNum',None,Denon_Parsing)
-    Denon.SubscribeStatus('DiscTypeStatus',None,Denon_Parsing)
-    Denon.SubscribeStatus('PlaybackStatus',None,Denon_Parsing)
-    Denon.SubscribeStatus('Power',None,Denon_Parsing)
-
-    ## Update Functions
-    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'})
-    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'})
-    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'})
-    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'})
-    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'})
-    Denon.Update('CurrentChapterTrackNum')
-    Denon.Update('CurrentTitleAlbumNum')
-    Denon.Update('DiscTypeStatus')
-    Denon.Update('PlaybackStatus')
-    Denon.Update('Power')
     
     ## Recursive Functions
     UpdateLoop()
@@ -85,6 +63,48 @@ def Initialize():
     print("System Initialize")
     pass
 
+## SUBSCRIBE FUNCTIONS ---------------------------------------------------------
+def SubscribeBiamp():
+    Biamp.SubscribeStatus('ConnectionStatus',None,Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'},Biamp_Parsing)
+    Biamp.SubscribeStatus('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'},Biamp_Parsing)
+    pass
+
+def SubscribeQuantum():
+    pass
+
+def SubscribeDenon():
+    Denon.SubscribeStatus('ConnectionStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('CurrentChapterTrackNum',None,Denon_Parsing)
+    Denon.SubscribeStatus('CurrentTitleAlbumNum',None,Denon_Parsing)
+    Denon.SubscribeStatus('DiscTypeStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('PlaybackStatus',None,Denon_Parsing)
+    Denon.SubscribeStatus('Power',None,Denon_Parsing)
+    pass
+
+## UPDATE FUNCTIONS ------------------------------------------------------------
+def UpdateBiamp():
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorA'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorB'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorC'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorD'})
+    Biamp.Update('SourceSelectorSourceSelection',{'Instance Tag':'SelectorE'})
+    pass
+
+def UpdateQuantum():
+    pass
+
+def UpdateDenon():
+    Denon.Update('CurrentChapterTrackNum')
+    Denon.Update('CurrentTitleAlbumNum')
+    Denon.Update('DiscTypeStatus')
+    Denon.Update('PlaybackStatus')
+    Denon.Update('Power')
+    pass
+
 ## DATA PARSING FUNCTIONS ------------------------------------------------------
 ## These functions receive the data of the devices in real time
 ## Each function stores the parsed data in dictionaries and activate feedback
@@ -92,7 +112,7 @@ def Initialize():
 def Biamp_Parsing(command,value,qualifier):
     ##
     if command == 'ConnectionStatus':
-        print('Biamp Module connection status {}'.format(value))
+        print('Biamp Module Conex status: {}'.format(value))
 
         if value == 'Connected':
             Biamp_Data['ConexModule'] = True
@@ -106,6 +126,8 @@ def Biamp_Parsing(command,value,qualifier):
             Btn_Group['SetC'].SetCurrent(None)
             Btn_Group['SetD'].SetCurrent(None)
             Btn_Group['SetE'].SetCurrent(None)
+            ## Disconnect the IP Socket
+            Biamp.Disconnect()
     ##
     elif command == 'SourceSelectorSourceSelection':
         print(str(qualifier) + ' ' + str(value))
@@ -140,7 +162,7 @@ def Biamp_Parsing(command,value,qualifier):
 def Quantum_Parsing(command,value,qualifier):
     ##
     if command == 'ConnectionStatus':
-        print('Biamp Module connection status {}'.format(value))
+        print('Biamp Module Conex status: {}'.format(value))
 
         if value == 'Connected':
             Quantum_Data['ConexModule'] = True
@@ -149,6 +171,8 @@ def Quantum_Parsing(command,value,qualifier):
         elif value == 'Disconnected':
             Quantum_Data['ConexModule'] = False
             Btn['LANVWall'].SetState(0)
+            ## Disconnect the IP Socket
+            Quantum.Disconnect()
     ##
     elif command == 'DeviceStatus':
         print(value)
@@ -157,7 +181,7 @@ def Quantum_Parsing(command,value,qualifier):
 def Denon_Parsing(command,value,qualifier):
     ##
     if command == 'ConnectionStatus':
-        print('Biamp Module connection status {}'.format(value))
+        print('Denon Module Conex status: {}'.format(value))
 
         if value == 'Connected':
             Denon_Data['ConexModule'] = True
@@ -229,7 +253,6 @@ def DenonLabel():
 ## RECURSIVE FUNCTIONS -----------------------------------------------------------
 ## This functions report a 'Online' / 'Offline' status after to send the Connect() Method
 ## CAUTION: If you never make a Connect(), the Extron Module never will work with Subscriptions
-
 @event(Biamp, 'Connected')
 @event(Biamp, 'Disconnected')
 def BiampConnectionHandler(interface, state):
@@ -237,6 +260,9 @@ def BiampConnectionHandler(interface, state):
     if state == 'Connected':
         Btn['LANBiamp'].SetState(1)
         Biamp_Data['ConexEvent'] = True
+        ## Send & Query Information
+        SubscribeBiamp()
+        UpdateBiamp()
     if state == 'Disconnected':
         Btn['LANBiamp'].SetState(0)
         Biamp_Data['ConexEvent'] = False
@@ -250,6 +276,9 @@ def QuantumConnectionHandler(interface, state):
     if state == 'Connected':
         Btn['LANVWall'].SetState(1)
         Quantum_Data['ConexEvent'] = True
+        ## Send & Query Information
+        SubscribeQuantum()
+        UpdateQuantum()
     if state == 'Disconnected':
         Btn['LANVWall'].SetState(0)
         Quantum_Data['ConexEvent'] = False
@@ -261,7 +290,7 @@ def QuantumConnectionHandler(interface, state):
 def Trying():
     if Biamp_Data['ConexEvent'] == False:
         print('Tryng to make a Connect() in Biamp')
-        Biamp.Connect()
+        Biamp.Connect(4) ## Have 4 seconds to try to connect
         LoopTrying.Restart()
     pass
 LoopTrying = Wait(5, Trying) ## Invoke a validate function every 5s
@@ -269,7 +298,7 @@ LoopTrying = Wait(5, Trying) ## Invoke a validate function every 5s
 def Trying2():
     if Quantum_Data['ConexEvent'] == False:
         print('Tryng to make a Connect() in Quantum')
-        Quantum.Connect()
+        Quantum.Connect(4) ## Have 4 seconds to try to connect
         LoopTrying2.Restart()
     pass
 LoopTrying2 = Wait(5, Trying2) ## Invoke a validate function every 5s
@@ -293,7 +322,8 @@ Biamp_Data = {
     'ConexEvent' : None,
 }
 Quantum_Data = {
-    'Conex'        : None,
+    'ConexModule': None,
+    'ConexEvent' : None,
 }
 ## Data dictionaries - RS232 Devices
 Denon_Data = {
@@ -706,9 +736,9 @@ def BROptionEvents(button, state):
 
     if button is Btn['BRPower'] and state == 'Pressed':
         print("BluRay Pressed: %s" % 'Power')
-        if Denon_Data['Power'] == 'On':
+        if Denon_Data['Power'] == True:
             Denon.Set('Power','Off')
-        elif Denon_Data['Power'] == 'Off':
+        elif Denon_Data['Power'] == False:
             Denon.Set('Power','On')
     pass
     

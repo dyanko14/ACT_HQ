@@ -1,20 +1,20 @@
-## -------------------------------------------------------------------------- ##
-## Business   | Asesores y Consultores en Tecnología S.A. de C.V. ----------- ##
-## Programmer | Dyanko Cisneros Mendoza
-## Customer   | Human Quality
-## Project    | VideoWall Room
-## Version    | 0.1 --------------------------------------------------------- ##
+""" --------------------------------------------------------------------------
+ Business   | Asesores y Consultores en Tecnología S.A. de C.V.
+ Programmer | Dyanko Cisneros Mendoza
+ Customer   | Human Quality
+ Project    | VideoWall Room
+ Version    | 0.1 --------------------------------------------------------- """
 
 ## CONTROL SCRIPT IMPORT -------------------------------------------------------
 from extronlib.device import UIDevice
-from extronlib.ui import Button, Label, Level
+from extronlib.ui import Button, Label
 from extronlib.system import MESet
 
 # UI Device
 TLP = UIDevice('TouchPanel')
 
 # UI Buttons
-Btn = {
+BTN = {
     ## Index
     'Index'   : Button(TLP, 1),
     ## Main
@@ -117,93 +117,93 @@ Btn = {
     'BRTray'  : Button(TLP, 148),
     'BRPower' : Button(TLP, 150),
     ## Status
-    'LANBiamp' : Button(TLP, 201),
-    'LANVWall' : Button(TLP, 202),
-    'LANIPCP'  : Button(TLP, 203),
-    '232Denon' : Button(TLP, 204),
+    'LANBiamp': Button(TLP, 201),
+    'LANVWall': Button(TLP, 202),
+    'LANIPCP' : Button(TLP, 203),
+    '232Denon': Button(TLP, 204),
     ## PowerOff
-    'PowerAll' : Button(TLP, 220, repeatTime = 1),
+    'PowerAll': Button(TLP, 220, repeatTime=1),
 }
 
 # UI Page Buttons
-Btn_Page = {
-    'Main': [Btn['Video'],Btn['Audio'],Btn['Bluray'],Btn['Status'],Btn['Power']],
-    
-    'VW'  : [Btn['VHDMI'],Btn['VPS4'],Btn['VXbox'],Btn['VBluray'],
-             Btn['VSky'],Btn['VRoku'],Btn['VPC'],Btn['VShare']],
-    
-    'VWP' : [Btn['VP1'],Btn['VP2'],Btn['VP3'],Btn['VP4'],
-             Btn['VP5'],Btn['VP6'],Btn['VP7'],Btn['VP8']],
-    
-    'VWPw': [Btn['VWPwr1'],Btn['VWPwr0']],
-    
-    'Set' : [Btn['SetA'],Btn['SetB'],Btn['SetC'],Btn['SetD'],Btn['SetE']],
-    
-    'SetA': [Btn['A_HDMI'],Btn['A_PS4'],Btn['A_Xbox'],Btn['A_Bluray'],
-             Btn['A_Sky'],Btn['A_Roku'],Btn['A_PC'],Btn['A_Share']],
-    
-    'SetB': [Btn['B_HDMI'],Btn['B_PS4'],Btn['B_Xbox'],Btn['B_Bluray'],
-             Btn['B_Sky'],Btn['B_Roku'],Btn['B_PC'],Btn['B_Share']],
-    
-    'SetC': [Btn['C_HDMI'],Btn['C_PS4'],Btn['C_Xbox'],Btn['C_Bluray'],
-             Btn['C_Sky'],Btn['C_Roku'],Btn['C_PC'],Btn['C_Share']],
-    
-    'SetD': [Btn['D_HDMI'],Btn['D_PS4'],Btn['D_Xbox'],Btn['D_Bluray'],
-             Btn['D_Sky'],Btn['D_Roku'],Btn['D_PC'],Btn['D_Share']],
-    
-    'SetE': [Btn['E_HDMI'],Btn['E_PS4'],Btn['E_Xbox'],Btn['E_Bluray'],
-             Btn['E_Sky'],Btn['E_Roku'],Btn['E_PC'],Btn['E_Share']],
-    
-    'BRN' : [Btn['BRUp'],Btn['BRLeft'],Btn['BRDown'],Btn['BRRight'],Btn['BREnter']],
-    
-    'BRO' : [Btn['BRPopup'],Btn['BRSetup'],Btn['BRInfo'],Btn['BRReturn'],
-             Btn['BRTray'],Btn['BRPower']],
-    
-    'BRP' : [Btn['BRPrev'],Btn['BRBack'],Btn['BRPause'],Btn['BRPlay'],
-             Btn['BRStop'],Btn['BRRewi'],Btn['BRNext']],
+BTNPAGE = {
+    'Main': [BTN['Video'], BTN['Audio'], BTN['Bluray'], BTN['Status'], BTN['Power']],
+
+    'VW'  : [BTN['VHDMI'], BTN['VPS4'], BTN['VXbox'], BTN['VBluray'],
+             BTN['VSky'], BTN['VRoku'], BTN['VPC'], BTN['VShare']],
+
+    'VWP' : [BTN['VP1'], BTN['VP2'], BTN['VP3'], BTN['VP4'],
+             BTN['VP5'], BTN['VP6'], BTN['VP7'], BTN['VP8']],
+
+    'VWPw': [BTN['VWPwr1'], BTN['VWPwr0']],
+
+    'Set' : [BTN['SetA'], BTN['SetB'], BTN['SetC'], BTN['SetD'], BTN['SetE']],
+
+    'SetA': [BTN['A_HDMI'], BTN['A_PS4'], BTN['A_Xbox'], BTN['A_Bluray'],
+             BTN['A_Sky'], BTN['A_Roku'], BTN['A_PC'], BTN['A_Share']],
+
+    'SetB': [BTN['B_HDMI'], BTN['B_PS4'], BTN['B_Xbox'], BTN['B_Bluray'],
+             BTN['B_Sky'], BTN['B_Roku'], BTN['B_PC'], BTN['B_Share']],
+
+    'SetC': [BTN['C_HDMI'], BTN['C_PS4'], BTN['C_Xbox'], BTN['C_Bluray'],
+             BTN['C_Sky'], BTN['C_Roku'], BTN['C_PC'], BTN['C_Share']],
+
+    'SetD': [BTN['D_HDMI'], BTN['D_PS4'], BTN['D_Xbox'], BTN['D_Bluray'],
+             BTN['D_Sky'], BTN['D_Roku'], BTN['D_PC'], BTN['D_Share']],
+
+    'SetE': [BTN['E_HDMI'], BTN['E_PS4'], BTN['E_Xbox'], BTN['E_Bluray'],
+             BTN['E_Sky'], BTN['E_Roku'], BTN['E_PC'], BTN['E_Share']],
+
+    'BRN' : [BTN['BRUp'], BTN['BRLeft'], BTN['BRDown'], BTN['BRRight'], BTN['BREnter']],
+
+    'BRO' : [BTN['BRPopup'], BTN['BRSetup'], BTN['BRInfo'], BTN['BRReturn'],
+             BTN['BRTray'], BTN['BRPower']],
+
+    'BRP' : [BTN['BRPrev'], BTN['BRBack'], BTN['BRPause'], BTN['BRPlay'],
+             BTN['BRStop'], BTN['BRRewi'], BTN['BRNext']],
 }
 
 # UI Group Page Buttons
-Btn_Group = {
-    'Mode': MESet(Btn_Page['Main']),
-    
-    'Set' : MESet(Btn_Page['Set']),
-    
-    'SetA': MESet(Btn_Page['SetA']),
-    
-    'SetB': MESet(Btn_Page['SetB']),
-    
-    'SetC': MESet(Btn_Page['SetC']),
-    
-    'SetD': MESet(Btn_Page['SetD']),
-    
-    'SetE': MESet(Btn_Page['SetE']),
-    
-    'BR'  : MESet(Btn_Page['BRP']),
+BTNGROUP = {
+    'Mode': MESet(BTNPAGE['Main']),
+
+    'Set' : MESet(BTNPAGE['Set']),
+
+    'SetA': MESet(BTNPAGE['SetA']),
+
+    'SetB': MESet(BTNPAGE['SetB']),
+
+    'SetC': MESet(BTNPAGE['SetC']),
+
+    'SetD': MESet(BTNPAGE['SetD']),
+
+    'SetE': MESet(BTNPAGE['SetE']),
+
+    'BR'  : MESet(BTNPAGE['BRP']),
 }
 
 # UI Button states
-Btn_State = {
-    'List' : ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped'],
+BTNSTATE = {
+    'List' : ['Pressed', 'Released', 'Held', 'Repeated', 'Tapped']
 }
 
 # UI Labels
-Lbl = {
+LBL = {
     'Master': Label(TLP, 300),
-     ## Audio
+    ## Audio
     'SetA'  : Label(TLP, 51),
     'SetB'  : Label(TLP, 52),
     'SetC'  : Label(TLP, 53),
     'SetD'  : Label(TLP, 54),
     'SetE'  : Label(TLP, 55),
-     ## BluRay
+    ## BluRay
     'Bluray': Label(TLP, 151),
-     ## Power
+    ## Power
     'AllOff'   : Label(TLP, 221),
     'CountAll' : Label(TLP, 222),
 }
 
-Popup = {
+POPUP = {
     'Index'  : 'Index',
     'Main'   : 'Main',
     'Video'  : 'VWall',
@@ -219,7 +219,7 @@ Popup = {
     'Power'  : 'x_PowerOff',
 }
 
-Page = {
+PAGE = {
     'Index'  : 'Index',
     'Main'   : 'Main',
 }

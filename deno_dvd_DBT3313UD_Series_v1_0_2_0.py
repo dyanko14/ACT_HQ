@@ -5,7 +5,7 @@ import re
 class DeviceClass():
     def __init__(self):
         self.Unidirectional = 'False'
-        self.connectionCounter = 15
+        self.connectionCounter = 5
 
         # Do not change this the variables values below
         self.DefaultResponseTimeout = 0.3
